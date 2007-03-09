@@ -127,8 +127,8 @@ class Forms
 		if($type == "multipart"){
 			$type = "enctype=\"multipart/form-data\"";
 		}
-		//name=\"$name\"
-		print "<form id=\"$name\" $type action=\"$action\" method=\"$method\" $target >";
+		//
+		print "<form id=\"$name\" name=\"$name\" $type action=\"$action\" method=\"$method\" $target >";
 	
 	}
 	
