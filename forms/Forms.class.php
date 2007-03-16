@@ -93,7 +93,7 @@ class Forms
 		
 		
 		print '<script type="text/javascript">
-				<!-- <![CDATA[ 
+				
 				Sortable.create(\'pairset_' . $name . '\',
      			{constraint:"vertical",
      	
@@ -102,7 +102,7 @@ class Forms
      			}
           
      			});
-     			// ]]> -->
+     			
      			</script>';
 	
 	
