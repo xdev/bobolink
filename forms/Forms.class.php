@@ -17,7 +17,7 @@ class Forms
 		
 		print '
 		<script type="text/javascript">
-			<!-- <![CDATA[ 
+			
 			listManager_' . $name .' = new listManager(
 				{
 					name: \'' . $name . '\',';
@@ -34,7 +34,7 @@ class Forms
 					print 'mode: \'' . $mode . '\'
 				}
 			);
-			// ]]> -->
+			
 		</script>';
 		
 		$listManager = 'listManager_' . $name;
