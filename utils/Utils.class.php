@@ -1,9 +1,17 @@
 <?php
 class Utils
 {
-
+	
+	
+	/**
+	* includeRandom
+	*
+	*
+	*
+	*/
 	// include a random selection from the given directory and file extention
 	public static function includeRandom($directory,$extension,$fullpath=true) {
+		
 		$files = scandir($_SERVER['DOCUMENT_ROOT'].$directory);
 		$extlen = strlen($extension);
 		foreach ($files as $key => $item) {
@@ -24,7 +32,12 @@ class Utils
 	}
 	
 	
-	
+	/**
+	* parseConfig
+	*
+	*
+	*
+	*/
 	
 	
 	public static function parseConfig($x)
@@ -42,6 +55,13 @@ class Utils
 		return $r;
 			
 	}
+	
+	/**
+	* checkArray
+	*
+	*
+	*
+	*/
 	
 	public static function checkArray($a,$vals)
 	{
@@ -62,8 +82,15 @@ class Utils
 	
 	}
 	
-	public static function arraySort($array, $key){
+	/**
+	* arraySort
+	*
+	*
+	*
+	*/
 	
+	public static function arraySort($array, $key)
+	{
 		for ($i = 0; $i < sizeof($array); $i++) { 
 			$sort_values[$i] = $array[$i][$key]; 
 		 } 
@@ -73,18 +100,33 @@ class Utils
 			$sorted_arr[] = $array[$arr_key]; 
 		} 
 		return $sorted_arr; 
-	
 	} 
+	
+	
+	/**
+	* formatHumanReadable
+	*
+	*
+	*
+	*/
+	
 	
 	public static function formatHumanReadable($text)
 	{
-	
 		$t = preg_replace('[_]',' ',$text);
 		$t = strtoupper($t{0}) . substr($t,1);
-		
-		return $t;
-	
+		return $t;	
 	}
+	
+	/**
+	* removeDups
+	*
+	* @param	array	
+	*
+	* @return  array
+	*
+	*/
+	
 	
 	public static function removeDups($array, $row_element) {   
 		$new_array[0] = $array[0];
@@ -100,8 +142,17 @@ class Utils
 		return $new_array;
 	}
 	
+	/**
+	* getTimeDifference
+	* taken from blog posting
+	*
+	* @param   string   the prefix name
+	*
+	* @return  string   timestamp
+	*
+	*/
 	
-	function getTimeDifference( $start, $end )
+	function getTimeDifference($start,$end)
 	{
 		$uts['start']      =    strtotime( $start );
 		$uts['end']        =    strtotime( $end );
@@ -133,29 +184,6 @@ class Utils
 	
 	
 	/**
-	* formatTimestamp
-	*
-	* @param   string   the prefix name
-	*
-	* @return  string   timestamp
-	*
-	*/
-	
-	public static function formatTimestamp($prefix,$name_space)
-	{
-		
-		$t_y = "year_" . $name_space . $prefix;
-		$t_m = "month_" . $name_space . $prefix;
-		$t_d = "day_" . $name_space . $prefix;
-		$t_h = "hour_" . $name_space . $prefix;
-		$t_ap = "am_pm_" . $name_space . $prefix;
-		$t_min = "minute_" . $name_space . $prefix;
-	
-		return ($_POST[$t_y] . "-" . $_POST[$t_m] . "-" . $_POST[$t_d] . " " . self::time_12_24($_POST[$t_h],$_POST[$t_ap]) . ":" . $_POST[$t_min] . ":00");
-		
-	}
-	
-	/**
 	* assembleDateTime
 	*
 	* @param   string   the prefix name
@@ -166,16 +194,7 @@ class Utils
 	
 	public static function assembleDateTime($prefix,$name_space)
 	{
-		
-		$t_y = "year_" . $name_space . $prefix;
-		$t_m = "month_" . $name_space . $prefix;
-		$t_d = "day_" . $name_space . $prefix;
-		$t_h = "hour_" . $name_space . $prefix;
-		$t_ap = "am_pm_" . $name_space . $prefix;
-		$t_min = "minute_" . $name_space . $prefix;
-	
-		return $_POST[$t_y] . "-" . $_POST[$t_m] . "-" . $_POST[$t_d] . " " . self::time_12_24($_POST[$t_h],$_POST[$t_ap]) . ":" . $_POST[$t_min] . ":00";
-		
+		return self::assembleDate($prefix,$name_space) . " " . self::assembleTime($prefix,$name_space);	
 	}
 	
 	/**
@@ -189,12 +208,32 @@ class Utils
 	
 	public static function assembleDate($prefix,$name_space)
 	{
-		
-		$t_y = "year_" . $name_space . $prefix;
-		$t_m = "month_" . $name_space . $prefix;
-		$t_d = "day_" . $name_space . $prefix;
+		$t_y = $name_space . $prefix . '_year';
+		$t_m = $name_space . $prefix . '_month';
+		$t_d = $name_space . $prefix . '_day';
 	
 		return $_POST[$t_y] . "-" . $_POST[$t_m] . "-" . $_POST[$t_d];
+	}
+	
+	/**
+	* assembleTime
+	*
+	* @param   string   the prefix name
+	*
+	* @return  string   timestamp
+	*
+	*/
+	
+	public static function assembleTime($prefix,$name_space)
+	{
+		
+		$t_h = $name_space . $prefix . '_hour';
+		$t_ap = $name_space . $prefix . '_meridiem';
+		$t_min = $name_space . $prefix . '_minute';
+		
+		//die(print(self::time_12_24($_POST[$t_h],$_POST[$t_ap])));
+		
+		return self::time12to24($_POST[$t_h],$_POST[$t_ap]) . ":" . $_POST[$t_min] . ":00";
 		
 	}
 	
@@ -290,7 +329,7 @@ class Utils
 	*
 	*/
 	
-	public static function time_24_12($time)
+	public static function time24to12($time)
 	{
 	
 		if($time > 12){
@@ -312,7 +351,7 @@ class Utils
 	*
 	*/
 	
-	public static function time_12_24($time,$am_pm)
+	public static function time12to24($time,$am_pm)
 	{
 	
 		if($am_pm == "PM"){
@@ -401,23 +440,7 @@ class Utils
 		}
 	
 	}
-	
-	/**
-	* toggleWindow
-	* closes related popup window and refreshes parent
-	*
-	*/
-	
-	public static function toggleWindow($link,$time)
-	{
-		print "<script type=\"text/javascript\">
-				toggleWindow('$link','$time');
-				</script>"; 
-	}
-	
-	
-	
-	
+		
 	/**
 	* setVar
 	*
@@ -539,44 +562,6 @@ class Utils
 	public static function metaRefresh($url,$time = 0)
 	{	
 		print '<meta http-equiv="refresh" content="'  . $time . '; url='  . $url . '" />';
-	}
-	
-	/**
-	* message_full
-	*
-	* used to print an entire content div and message
-	*
-	* @param   string   message to be displayed
-	*
-	* @return  null
-	*
-	*/
-	
-	public static function messageFull($msg)
-	{
-		print "<div id=\"content\">
-	<div class=\"error\">
-	$msg
-	</div>
-	</div>";
-	
-	}
-	
-	/**
-	* throw_error
-	*
-	* used to print an error div
-	*
-	* @param   string   message to be displayed
-	*
-	* @return  null
-	*
-	*/
-	
-	public static function throwError($msg)
-	{
-		print "<div class=\"error\">$msg</div>";
-	
 	}
 	
 	/**

@@ -3,6 +3,17 @@
 class Forms
 {
 	
+	/**
+	* listManager
+	* prints html for start of form tag
+	*
+	* @param   string   action
+	* @param   string   name
+	* @param   string   type = "" (multipart)
+	* @param   string   method = "post"
+	*
+	*/
+	
 	public static function listManager($name,$value,$options)
 	{
 		self::hidden($name,htmlentities($value));
@@ -649,7 +660,7 @@ class Forms
 		$tD = explode("-",$tA[0]);
 		$date = array($tD[1],$tD[2],$tD[0]);
 		$tD = explode(":",$tA[1]);
-		$t = explode(":",Utils::time_24_12($tD[0]));
+		$t = explode(":",Utils::time24to12($tD[0]));
 		$time = array($t[0],$tD[1],$t[1]);
 	
 			
@@ -698,7 +709,7 @@ class Forms
 	public static function dateComponent($date,$name,$name_space)
 	{
 
-		$r = "<select name=\""  . "month_$name\" class=\"noparse\" >";
+		$r = '<select name="'. $name. '_month" class="noparse" >';
 		$monthA = self::getMonths();
 		for($i=1;$i<13;$i++){
 			($i == $date[0]) ? $selected="selected=\"selected\"" : $selected = "";
@@ -708,7 +719,7 @@ class Forms
 		
 		$r .= '</select>';
 		$r .= '/';
-		$r .= "<select name=\"" . "day_$name\" class=\"noparse\" >";
+		$r .= '<select name="' . $name . '_day" class="noparse" >';
 		
 		for($i=1;$i<32;$i++){
 			($i == $date[1]) ? $selected="selected=\"selected\"" : $selected = "";
@@ -717,7 +728,7 @@ class Forms
 		
 		$r .= '</select>';
 		$r .= '/';
-		$r .= "<select name=\"" .  "year_$name\" class=\"noparse\" >";
+		$r .= '<select name="' .  $name . '_year" class="noparse" >';
 		
 		($date[2] < CMS_MIN_YEAR) ? $min = $date[2] : $min = CMS_MIN_YEAR;
 		($date[2] > CMS_MAX_YEAR) ? $max = $date[2] : $max = CMS_MAX_YEAR;
@@ -751,8 +762,7 @@ class Forms
 	public static function timeComponent($time,$name,$name_space)
 	{
 		
-		$r = "";
-		$r .= "<select name=\"" . "hour_$name\" class=\"noparse\" >";
+		$r = '<select name="' . $name . '_hour" class="noparse" >';
 		
 		for($i=1;$i<13;$i++){
 			($i == $time[0]) ? $selected="selected=\"selected\"" : $selected = "";
@@ -762,7 +772,7 @@ class Forms
 		
 		$r .= '</select>';
 		$r .= ':';
-		$r .= "<select name=\"" .  "minute_$name\" class=\"noparse\" >";
+		$r .= '<select name="' .  $name . '_minute" class="noparse" >';
 		
 		//$ta = array("00","05","10","15","20","25","30","35","40","45","50","55");
 		
@@ -774,7 +784,7 @@ class Forms
 		
 		$r .= '</select>';
 		
-		$r .= "<select name=\"" .  "am_pm_$name\" class=\"noparse\" >";
+		$r .= '<select name="' .  $name . '_meridiem" class="noparse" >';
 		
 		$ta = array("AM","PM");
 		for($i=0;$i<2;$i++){
@@ -796,12 +806,12 @@ class Forms
 	*
 	*/
 	
-	public static function selectTime($name="",$value,$options)
+	public static function selectTime($name,$value,$options)
 	{
 		
-		
-		$tA = explode(":",$value);
-		$time = array($tA[0],$tA[1],$tA[2]);
+		$tD = explode(":",$value);
+		$t = explode(":",Utils::time24to12($tD[0]));
+		$time = array($t[0],$tD[1],$t[1]);
 	
 		$r = self::timeComponent($time,$name,$options['name_space']);
 		
@@ -809,37 +819,6 @@ class Forms
 		
 	}
 	
-	/**
-	* date
-	* prints html for select - uses self::buildHalf to print
-	*
-	* @param   string   label
-	* @param   string   name
-	* @param   string   value
-	*
-	*/
-	
-	public static function dateDefault($name="",$value,$options)
-	{
-		
-		
-		if($value == ""){
-			if($name == "start_event" || $name == "event_date"){			
-				$value = $utils->date_today();
-			}
-			if($name == "end_event"){			
-				$value = $utils->date_today();
-			}
-		}
-		
-		$tA = explode("-",$value);
-		$date = array($tA[1],$tA[2],$tA[0]);
-		
-		$r = self::dateComponent($date,$name);
-		
-		self::buildElement($name,$r,$options);
-	
-	}
 
 }
 
