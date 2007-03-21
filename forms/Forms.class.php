@@ -16,7 +16,7 @@ class Forms
 	
 	public static function listManager($name,$value,$options)
 	{
-		self::hidden($name,htmlentities($value));
+		self::hidden($name,preg_replace('["]',htmlentities('"'),$value));
 		
 		if(!isset($options['mode'])){
 			$mode = 'pair';
@@ -51,6 +51,30 @@ class Forms
 		$listManager = 'listManager_' . $name;
 				
 		$r = "<ul id=\"pairset_$name\" class=\"pairset\" >";
+		
+		/*
+		<data>
+			<item>
+				<name>Test</name>
+				<value>bla.jpg</value>
+			</item>
+			<item>
+				<name>Something</name>
+				<value>wfw.jpg</value>
+			</item>
+		</data>
+		*/
+		
+		$itemsA = array();
+		/*
+		$xml = simplexml_load_string($value);
+		if($xml){
+			foreach($xml->item as $item){
+				$itemsA[] = array('name'=>$item->name,'value'=>$item->value);					
+			}
+		}
+		*/
+		
 		$tA = explode("+_+",$value);
 		
 		
@@ -86,13 +110,32 @@ class Forms
 					<li id="' .$name . '_' . $i .'" class="pair single">
 						<div class="handle"></div>
 						<label class="label" >';
-						(isset($options['label_name'])) ? $r .= $options['label_name'] : $r .= 'Name';
+						(isset($options['label_value'])) ? $r .= $options['label_value'] : $r .= 'Value';
 						$r .= '</label>
 						<div class="input" onclick="' . $listManager . '.editItem(this);"><pre>'.$tA[$i].'</pre></div>						
 						<a class="icon delete" style="float: left;" href="#" onclick="' . $listManager . '.deleteItem(this); return false;">Delete</a>
 					</li>';
 				}
 			}		
+		}
+		
+		if($mode == 'images'){
+			$i=0;
+			foreach($itemsA as $item){
+			
+				$r .= '
+				<li id="' .$name . '_' . $i .'" class="pair images">
+					<div class="handle"></div>
+					<label class="label" >';
+					(isset($options['label_name'])) ? $r .= $options['label_name'] : $r .= 'Name';
+					$r .= '</label>
+					<div class="input" onclick="' . $listManager . '.editItem(this);"><pre>'.$item['name'].'</pre></div>
+					<label class="label">Image</label>
+					<input type="file" class="img" id="' . $name . '_' .$i . '_img" name="' . $name . '_' . $i . '_img" />				
+					<a class="icon delete" style="float: left;" href="#" onclick="' . $listManager . '.deleteItem(this); return false;">Delete</a>
+				</li>';
+				$i++;
+			}
 		}
 		
 				
@@ -272,8 +315,8 @@ class Forms
 		(isset($options['type'])) ? $type = $options['type'] : $type = "text";
 		
 		(isset($options['validate'])) ? $class .= ' validate ' . $options['validate'] : '';
-
-		$value = htmlentities($value);
+		
+		$value = preg_replace('["]',htmlentities('"'),$value);
 		self::buildElement($name,"<input type=\"$type\" class=\"$class\" name=\"$name\" id=\"$name\" value=\"$value\" size=\"$size\" maxlength=\"$max\" />",$options);
 	
 	}
