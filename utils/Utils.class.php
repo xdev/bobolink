@@ -613,7 +613,7 @@ class Utils
 		
 		if($options['mode'] == 'png'){
 			imageSaveAlpha($dst_img, true);
-			imagepng($dst_img,$dst_name,$options['quality']); 
+			imagepng($dst_img,$dst_name); 
 		}
 		
 		if($options['mode'] == 'jpg'){
