@@ -14,6 +14,13 @@ class Forms
 	*
 	*/
 	
+	public $db;
+	
+	public function setDb($database)
+	{
+		$this->db = $database;
+	}
+	
 	public static function listManager($name,$value,$options)
 	{
 		self::hidden($name,preg_replace('["]',htmlentities('"'),$value));
@@ -476,7 +483,7 @@ class Forms
 	*
 	*/
 	
-	public static function selectDefault($name,$value,$options)
+	public function selectDefault($name,$value,$options)
 	{
 		(isset($options['select_sql'])) ? $data_source = $options['select_sql'] : $data_source = false;
 		(isset($options['col_value'])) ? $col_value = $options['col_value'] : $col_value = "id";
@@ -488,7 +495,7 @@ class Forms
 		
 		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
 		$r .= '<option value="">(none)</option>';
-		$q = Db::query($data_source);
+		$q = $this->db->query($data_source);
 		$dA = explode("|",$col_display);
 		
 		//$r .= "<option value=\"0\">(none)</option>";
@@ -611,13 +618,13 @@ class Forms
 	*
 	*/
 	
-	public static function selectState($name="state",$value,$options)
+	public function selectState($name="state",$value,$options)
 	{
 		(isset($options['country'])) ? $country = $options['country'] : $country = 227;
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
 		
 		
-		$q = Db::query("SELECT * FROM cms_states WHERE country_id = '$country' ORDER BY name");
+		$q = $this->db->query("SELECT * FROM cms_states WHERE country_id = '$country' ORDER BY name");
 		
 		$r = "<select name=\"$name\" id=\"$name\">";
 		$r .= "<option value=\"0\">----------</option>";
@@ -651,12 +658,12 @@ class Forms
 	*
 	*/
 	
-	public static function selectCountry($name="country",$value,$options)
+	public function selectCountry($name="country",$value,$options)
 	{
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
 		
 		
-		$q = Db::query("SELECT * FROM `cms_countries` WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
+		$q = $this->db->query("SELECT * FROM `cms_countries` WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
 		$tl = count($q);
 		$r = '<select name="'.$name.'" id="'.$name.'" onchange="toggleCountry();">';
 			
@@ -671,7 +678,7 @@ class Forms
 		$r .= "<option value=\"0\">----------------------------------</option>";
 			
 		
-		$q = Db::query("SELECT * FROM `cms_countries` WHERE active = 1");
+		$q = $this->db->query("SELECT * FROM `cms_countries` WHERE active = 1");
 		$tl = count($q);
 			
 		for($i=0;$i<$tl;$i++){

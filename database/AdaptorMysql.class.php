@@ -1,25 +1,27 @@
 <?php
 
-class Db
+class AdaptorMysql implements Db
 {
-
-	/**
-	* connect
-	* connect to db using info from config.inc
-	*
-	*/
+	
 	private $connection;
 	
-	function __construct()
+	/**
+	* connect
+	* 
+	*
+	*/
+	
+	public function __construct()
 	{
-		//print "CONSTRUCT DB";
 		$this->openConnection();
 	}
 	
-	function __destruct()
+	public function __destruct()
 	{
 		$this->closeConnection();
 	}
+	
+	
 	
 	function openConnection()
 	{
@@ -37,10 +39,6 @@ class Db
 	{
 		mysql_close($this->connection);
 	}
-		
-		
-	//*/
-	
 	
 	/**
 	* querySimple
@@ -56,6 +54,7 @@ class Db
 		$r = mysql_query($sql) or die(mysql_error() . $sql);
 		return $r;
 	}
+		
 	
 	/**
 	* queryRow
@@ -66,11 +65,11 @@ class Db
 	* @return  array    associate/numeric
 	*/
 	
-	public static function queryRow($sql)
+	public function queryRow($sql)
 	{
-	
 		$r = mysql_query($sql) or die(mysql_error() . $sql);
 		$tA = mysql_fetch_array($r,MYSQL_BOTH);
+		
 		
 		
 		if(mysql_num_rows($r) == 0){
@@ -91,7 +90,7 @@ class Db
 	* @return  array    associate/numeric array
 	*/
 	
-	public static function query($sql){
+	public function query($sql){
 	
 		$r = mysql_query($sql) or die(mysql_error() . $sql);
 		if(mysql_num_rows($r) == 0){
@@ -224,7 +223,8 @@ class Db
 		return $searchQ;
 	
 	}
-	
+
 
 }
+
 ?>
