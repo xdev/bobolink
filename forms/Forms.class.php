@@ -210,7 +210,7 @@ class Forms
 		
 		printf(
 			'
-			<div class="form_item" id="form_item_%s">
+			<div class="form_item" id="form_item_%s" %s>
 				<label for="%s"%s>%s</label>
 				<div class="input">
 					%s
@@ -219,6 +219,7 @@ class Forms
 			</div>
 			',
 			$name,
+			isset($options['style_main']) ? 'style="' . $options['style_main'] . '"' : '',
 			$name,
 			isset($options['validate']) && $options['validate'] ? ' class="must_validate '.$options['validate'].'"' : '',
 			$options['label'],
@@ -488,7 +489,7 @@ class Forms
 		(isset($options['select_sql'])) ? $data_source = $options['select_sql'] : $data_source = false;
 		(isset($options['col_value'])) ? $col_value = $options['col_value'] : $col_value = "id";
 		(isset($options['col_display'])) ? $col_display = $options['col_display'] : $col_display = "name";
-		(isset($options['onchange'])) ? $onchange = "onchange=\"$otions[onchange]\"" : $onchange = "";
+		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
 		(isset($options['validate'])) ? $class .= ' validate ' . $options['validate'] : '';
@@ -589,9 +590,9 @@ class Forms
 	{	
 		(isset($options['dataA'])) ? $dataA = $options['dataA'] : $dataA = array();
 		(isset($options['onchange'])) ? $onchange = "onchange=\"$otions[onchange]\"" : $onchange = "";
+		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
-		
-		$r = "<select name=\"$name\" id=\"$name\" $onchange>";
+		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
 		
 		for($i=0;$i<count($dataA);$i++){
 			$_label = $dataA[$i][0];
@@ -622,11 +623,12 @@ class Forms
 	{
 		(isset($options['country'])) ? $country = $options['country'] : $country = 227;
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
-		
+		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
+		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
 		$q = $this->db->query("SELECT * FROM cms_states WHERE country_id = '$country' ORDER BY name");
 		
-		$r = "<select name=\"$name\" id=\"$name\">";
+		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
 		$r .= "<option value=\"0\">----------</option>";
 		foreach($q as $state){
 			
@@ -661,11 +663,12 @@ class Forms
 	public function selectCountry($name="country",$value,$options)
 	{
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
-		
+		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
+		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
 		$q = $this->db->query("SELECT * FROM `cms_countries` WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
 		$tl = count($q);
-		$r = '<select name="'.$name.'" id="'.$name.'" onchange="toggleCountry();">';
+		$r = '<select name="'.$name.'" id="'.$name.'" class="'. $class . '" '. $onchange . '>';
 			
 		$sel = false;
 		for($i=0;$i<$tl;$i++){
