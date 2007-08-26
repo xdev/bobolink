@@ -1,25 +1,43 @@
 <?php
 
+/*
+
+Class: Forms
+
+Collection of functions dealing with creating form elements
+
+Typical use is as follows
+	
+	(start code)
+	
+	formMethod($name,$value,$options)
+	
+	(end)
+
+*/
+
 class Forms
 {
-	
-	/**
-	* listManager
-	* prints html for start of form tag
-	*
-	* @param   string   action
-	* @param   string   name
-	* @param   string   type = "" (multipart)
-	* @param   string   method = "post"
-	*
-	*/
-	
+
 	public $db;
 	
 	public function setDb($database)
 	{
 		$this->db = $database;
 	}
+	
+	/*
+	
+	Function: listManager
+	
+	prints html for start of form tag
+	
+	* @param   string   action
+	* @param   string   name
+	* @param   string   type = "" (multipart)
+	* @param   string   method = "post"
+	*
+	*/
 	
 	public static function listManager($name,$value,$options)
 	{
@@ -172,9 +190,13 @@ class Forms
 	
 	
 	
-	/**
-	* init
-	* prints html for start of form tag
+	/*
+	
+	Function: init
+	
+	prints html for start of form tag
+	
+	Parameters:
 	*
 	* @param   string   action
 	* @param   string   name
@@ -194,10 +216,13 @@ class Forms
 	}
 	
 	
-	/**
-	* buildElement
-	* prints html for standard item div
-	*	
+	/*
+	
+	Function: buildElement
+	
+	prints html for standard item div
+	
+	Parameters:
 	* @param   string   label
 	* @param   string   name
 	* @param   string   content
@@ -242,13 +267,27 @@ class Forms
 		</div>";
 		*/
 	}
-		
+	
+	/*
+	
+	Function: closeTag
+	
+	Consider dropping.. totally useless
+	
+	*/
 	
 	public static function closeTag()
 	{
 		print "</form>";
 	}
 	
+	/*
+	
+	Function: buttons
+	
+	Consider dropping.. totally useless
+	
+	*/
 	
 	public static function buttons()
 	{
@@ -261,6 +300,14 @@ class Forms
 	
 	}
 	
+	/*
+	
+	Function: buttonsRelated
+	
+	Consider dropping.. totally useless
+	
+	*/
+	
 	public static function buttonsRelated()
 	{
 		global $label;
@@ -272,18 +319,25 @@ class Forms
 	
 	}
 	
+	/*
+	
+	Function: fileField
+	
+	file field input
+	
+	*/
 	
 	public static function fileField($name,$value="",$options)
 	{
 		self::buildElement($name,"<input type=\"file\" class=\"file\" id=\"$name\" name=\"$name\" />",$options);
 	}
 	
-	/**
-	* static
-	* 
-	* @param   string   label
-	* @param   string   value 
-	*
+	/*
+	
+	Function: readonly
+	
+	readonly value
+	
 	*/
 	
 	
@@ -304,15 +358,12 @@ class Forms
 	
 	}
 	
-	/**
-	* text
-	* prints html for text input
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   value
-	* @param   array    options ( size , max , class , type , tip )
-	*
+	/*
+	
+	Function: text
+	
+	text input
+	
 	*/
 	
 	public static function text($name,$value = "",$options)
@@ -329,16 +380,12 @@ class Forms
 	
 	}
 	
-	/**
-	* textarea
-	* prints html for textarea input
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   value
-	* @param   string   rows
-	* @param   string   cols
-	*
+	/*
+	
+	Function: textarea
+	
+	textarea input
+	
 	*/
 	
 	public static function textarea($name,$value = "",$options)
@@ -353,15 +400,12 @@ class Forms
 		
 	}
 	
-	/**
-	* checkbox
-	* prints html for text input
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   value
-	* @param   string   default = "Y"
-	*
+	/*
+	
+	Function: checkbox
+	
+	checkbox input
+	
 	*/
 	
 	public static function checkbox($name,$value = "",$options)
@@ -375,15 +419,12 @@ class Forms
 	
 	}
 	
-	/**
-	* checkboxBasic
-	* prints html for text input w/out surrounding div
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   value
-	* @param   string   default = "Y"
-	*
+	/*
+	
+	Function: checkboxBasic
+	
+	checkbox input w/out surrounding div
+
 	*/
 	
 	public static function checkboxBasic($name,$value = "",$options)
@@ -398,14 +439,18 @@ class Forms
 	
 	}
 	
-	/**
-	* button
-	* prints html for button
-	*
-	* @param   string   type (button or submit)
-	* @param   string   value
-	* @param   string   javascript onclick
-	*
+	/*
+	
+	Function: button
+	
+	input type button
+	
+	Parameters:
+	
+		type:String - type (button || submit)
+		valule:String - label
+		click:String - javascript or anything else to be added
+		
 	*/
 	
 	public static function button($type,$value,$click="")
@@ -417,13 +462,12 @@ class Forms
 	
 	}
 	
-	/**
-	* hidden
-	* prints html for hidden form variable
-	*
-	* @param   string   variable name
-	* @param   string   value
-	*
+	/*
+	
+	Function: hidden
+	
+	prints html for hidden form variable
+
 	*/
 	
 	public static function hidden($name,$value,$options=null)
@@ -435,16 +479,12 @@ class Forms
 		print 'name="' . $name . '" value="' . $value .'" />';
 	}
 	
+	/*
 	
-	/**
-	* boolean
-	* prints html for boolean pull down
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   number   value
-	* @param   number   default value = 1
-	*
+	Function: boolean
+	
+	boolean pull down
+	
 	*/
 	
 	public static function boolean($name,$value = "",$options)
@@ -466,13 +506,15 @@ class Forms
 		</select>";
 		
 		self::buildElement($name,$r,$options);
-		
 	
 	}
 	
-	/**
-	* select 
-	* prints html for select - uses self::buildHalf to print
+	/*
+	
+	Function: select 
+	
+	builds a select dropdown based upon infor for a query
+	
 	*
 	* @param   string   label
 	* @param   string   variable name
@@ -530,20 +572,17 @@ class Forms
 		self::buildElement($name,$r,$options);
 	}
 	
-	/**
-	* selectFiles
-	* prints html for select - uses self::buildHalf to print
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   folder
-	* @param   string   value
-	*
+	/*
+	
+	Function: selectFiles
+	
+	Scans a folder and creates a select input
+	
 	*/
 	
 	public static function selectFiles($name,$value,$options)
 	{
-		(isset($options['folder'])) ? $folder = $otions['folder'] : $folder = false;
+		(isset($options['folder'])) ? $folder = $options['folder'] : $folder = false;
 		
 		//folder
 		
@@ -572,18 +611,12 @@ class Forms
 		
 	}
 	
+	/*
 	
+	Function: selectStatic
 	
-	/**
-	* selectStatic
-	* prints html for select - uses self::buildHalf to print
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   data array
-	* @param   string   value
-	* @param   string   javascript onchange
-	*
+	builds a select from an existing array
+	
 	*/
 	
 	public static function selectStatic($name,$value,$options)
@@ -606,17 +639,12 @@ class Forms
 		self::buildElement($name,$r,$options);
 	}
 	
-	/**
-	* selectState
-	* prints html for select - uses self::buildHalf to print
-	* pulls from static file 'states.inc'
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   value
-	* @param   number   country
-	* @param   string   mode
-	*
+	/*
+	
+	Function: selectState
+	
+	select state (uses cms_states for datasource)
+	
 	*/
 	
 	public function selectState($name="state",$value,$options)
@@ -648,16 +676,12 @@ class Forms
 		}
 	}
 		
+	/*
 	
-	/**
-	* selectCountry
-	* prints html for select - uses self::buildHalf to print
-	* requires installation of countries table
-	*
-	* @param   string   label
-	* @param   string   variable name
-	* @param   string   value
-	*
+	Function: selectCountry
+	
+	select country (uses cms_countries for datasource)
+	
 	*/
 	
 	public function selectCountry($name="country",$value,$options)
@@ -677,9 +701,7 @@ class Forms
 			$r .= "<option value=\"$row[id]\" $selected >$row[name]</option>";
 		}
 		
-			
 		$r .= "<option value=\"0\">----------------------------------</option>";
-			
 		
 		$q = $this->db->query("SELECT * FROM `cms_countries` WHERE active = 1");
 		$tl = count($q);
@@ -701,6 +723,14 @@ class Forms
 	
 	}
 	
+	/*
+	
+	Function: selectDateTime
+	
+	select with break out for each compontent (except seconds)
+	uses internal methods <dateComponent> and <timeComponent>
+	
+	*/
 	
 	public static function selectDateTime($name="",$value,$options)
 	{
@@ -727,6 +757,15 @@ class Forms
 	
 	}
 	
+	/*
+	
+	Function: selectDate
+	
+	select just date bits
+	uses internal methods <dateComponent>
+	
+	*/
+		
 	public static function selectDate($name="",$value,$options)
 	{
 		
@@ -747,16 +786,17 @@ class Forms
 	}
 	
 	
-	/**
-	* dateComponent
-	* prints html for select
-	* uses info in config.inc for CMS_MIN and CMS_MAX_YEAR
-	* 
+	/*
+	
+	Function: dateComponent
+	
+	internal date bits using CMS_MIN and CMS_MAX_YEAR (consider dropping this and feeding in)
+
 	* @param   string   date
 	* @param   string   variable name suffix
 	* 
 	* @return  string   html to print
-	*
+	
 	*/
 	
 	public static function dateComponent($date,$name,$name_space)
@@ -801,10 +841,12 @@ class Forms
 		return $r;
 	}
 	
-	/**
-	* timeComponent
-	* prints html for select
-	*
+	/*
+	
+	Function: timeComponent
+	
+	internal time bits
+	
 	* @param   string   time
 	* @param   string   variable name suffix
 	* 
@@ -849,14 +891,13 @@ class Forms
 	
 	}
 	
-	/**
-	* time
-	* prints html for select - uses self::buildHalf to print
-	*
-	* @param   string   label
-	* @param   string   name
-	* @param   string   value
-	*
+	/*
+	
+	Function: selectTime
+	
+	Select just time bits
+	Uses internal method <timeComponent>
+	
 	*/
 	
 	public static function selectTime($name,$value,$options)
@@ -870,8 +911,7 @@ class Forms
 		
 		self::buildElement($name,$r,$options);
 		
-	}
-	
+	}	
 
 }
 

@@ -1,14 +1,24 @@
 <?php
 
+/*
+
+Class: AdaptorMysql
+
+Collection of mysql wrapper functions
+
+*/
+
 class AdaptorMysql implements Db
 {
 	
 	private $connection;
 	
-	/**
-	* connect
-	* 
-	*
+	/*
+	
+	Constructor: __construct
+	
+	opens connection 
+	
 	*/
 	
 	public function __construct()
@@ -16,14 +26,28 @@ class AdaptorMysql implements Db
 		$this->openConnection();
 	}
 	
+	/*
+	
+	Destructor: __destruct
+	
+	closes connection
+	
+	*/
+	
 	public function __destruct()
 	{
 		$this->closeConnection();
 	}
 	
+	/*
 	
+	Function: openConnection
 	
-	function openConnection()
+	opens standard conection to db with $_GLOBALS['DATABASE']
+	
+	*/
+	
+	public function openConnection()
 	{
 		$DB = $GLOBALS['DATABASE'];
 				
@@ -35,43 +59,62 @@ class AdaptorMysql implements Db
 		mysql_select_db($DB['db']);
 	}
 	
-	function closeConnection()
+	/*
+	
+	Function: closeConnection
+	
+	closes connection
+	
+	*/
+	
+	public function closeConnection()
 	{
 		mysql_close($this->connection);
 	}
 	
-	/**
-	* querySimple
-	* query and return a resource identifier
-	*
-	* @param   string   sql query
-	*     
-	* @return  array    mysql resouce link
+	/*
+	
+	Function: querySimple
+	
+	query and return a resource identifier
+	
+	Parameters:
+	
+		sql:String - sql query
+	
+	Returns:
+	
+		array of mysql resource
+	
 	*/
 	
-	function sql($sql)
+	public function sql($sql)
 	{
 		$r = mysql_query($sql) or die(mysql_error() . $sql);
 		return $r;
 	}
-		
 	
-	/**
-	* queryRow
-	* query and return a row in array form
-	*
-	* @param   string   sql query
-	*     
-	* @return  array    associate/numeric
+	/*
+	
+	Function: queryRow
+	
+	query and return a row in array form
+	
+	Parameters:
+	
+		sql:String - sql query
+	
+	Returns:
+		
+		associate/numeric array
+		
 	*/
 	
 	public function queryRow($sql)
 	{
 		$r = mysql_query($sql) or die(mysql_error() . $sql);
 		$tA = mysql_fetch_array($r,MYSQL_BOTH);
-		
-		
-		
+				
 		if(mysql_num_rows($r) == 0){
 			return false;
 		}else{
@@ -81,13 +124,20 @@ class AdaptorMysql implements Db
 	
 	}
 	
-	/**
-	* query
-	* query and return a record set in array form
-	*
-	* @param   string   sql query
-	*     
-	* @return  array    associate/numeric array
+	/*
+	
+	Function: query
+	
+	query and return a recordset in array form
+	
+	Parameters:
+	
+		sql:String - sql query
+	
+	Returns:
+		
+		multidimensional associate/numeric array
+		
 	*/
 	
 	public function query($sql){
@@ -108,17 +158,37 @@ class AdaptorMysql implements Db
 		
 	}
 	
-	/**
-	* insert
-	* insert template
-	*
-	* @param   string   table
-	* @param   string   cols (csv)
-	* @param   array    values
-	*     
+	/*
+	
+	Function: insert
+	
+	insert template
+	
+	Parameters:
+	
+		table:String - table name
+		row_data:Array - array of col names and values
+	
+	Usage:
+	
+	(start code)
+	
+	$myA = array();
+	
+	$myA[] = array('field'=>'colname','value'=>'colvalue');
+	...
+	
+	$db->insert('table_name',$myA);
+	
+	(end)
+	
+	Returns:
+	
+		debug of sql query
+	
 	*/
 	
-	function insert($table,$row_data)
+	public function insert($table,$row_data)
 	{
 		
 		//need to make exception for mysql functions
@@ -147,18 +217,26 @@ class AdaptorMysql implements Db
 	}
 	
 	
-	/**
-	* update
-	* update template
-	*
-	* @param   string   table
-	* @param   string   cols (csv)
-	* @param   array    values
-	* @param   string   key column name
-	* @param   string   key value
-	*     
+	/*
+	
+	Function: update
+	
+	update template
+	
+	Parameters:
+	
+		table:String - string name
+		row_data:Array - array of column names and values
+		k:String - key name
+		v:String - key value
+	
+	Returns:
+	
+		debug of sql query
+	
 	*/
-	function update($table,$row_data,$k,$v)
+	
+	public function update($table,$row_data,$k,$v)
 	{
 		
 		$sql = "UPDATE `$table` SET ";
@@ -177,23 +255,25 @@ class AdaptorMysql implements Db
 		
 		return $sql;
 	
-	}
+	}	
 	
+	/*
 	
-	/**
-	* getInsertId
-	* query and return a row in array form
-	*
-	* @param   string   table
-	*     
-	* @return  integer  max id from table
+	Function: getInsertId
 	
-	BROKEN DO NOT USE
+	Gets value of auto_increment for a table. BROKEN DO NOT USE!
+	
+	Parameters:
+	
+		table:String - table name
+	
+	Returns:
+	
+		Number max id from table	
 	
 	*/
-	
-	
-	function getInsertId($table){
+		
+	public function getInsertId($table){
 		
 		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'");
 		$row = mysql_fetch_assoc($q);
@@ -201,17 +281,24 @@ class AdaptorMysql implements Db
 	
 	}
 	
-	/**
-	* generateSearch
-	* builds search WHERE sql statement
-	*
-	* @param   array    fields
-	* @param   string   search terms
-	*
-	* @return  string   WHERE component of sql statement
+	/*
+	
+	Function: generateSearch
+	
+	builds search WHERE sql statement using LIKE
+	
+	Parameters:
+	
+		fields:Array - array of fields
+		search:String - string value to search for
+	
+	Returns:
+	
+		WHERE component of sql statement
+
 	*/
 	
-	function generateSearch($fields,$search)
+	public function generateSearch($fields,$search)
 	{
 		$searchQ = "";
 		
@@ -223,7 +310,6 @@ class AdaptorMysql implements Db
 		return $searchQ;
 	
 	}
-
 
 }
 

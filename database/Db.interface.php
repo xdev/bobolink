@@ -1,5 +1,13 @@
 <?php
 
+/*
+
+Interface: Db
+
+For use with a variety of database adaptors
+
+*/
+
 interface Db
 {
 

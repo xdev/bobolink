@@ -1,15 +1,31 @@
 <?php
+
+/*
+
+Class: Utils
+
+Collection of general utility functions, static
+
+*/
+
 class Utils
 {
 	
 	
-	/**
-	* includeRandom
-	*
-	*
-	*
+	/*
+	
+	Function: includeRandom
+	
+	Include a random selection from the given directory and file extention
+	
+	Parameters:
+	
+		directory:String - directory to pull from
+		extension:String - file extension
+		fullpath:Boolean - if true, returns full path, if false just the filename
+	
 	*/
-	// include a random selection from the given directory and file extention
+	
 	public static function includeRandom($directory,$extension,$fullpath=true) {
 		
 		$files = scandir($_SERVER['DOCUMENT_ROOT'].$directory);
@@ -32,35 +48,55 @@ class Utils
 	}
 	
 	
-	/**
-	* parseConfig
-	*
-	*
-	*
+	/*
+	
+	Function: parseConfig
+	
+	Breaks apart standard <option name="bla">value</option> xml and returns array
+	
+	Parameters:
+	
+		x:String - xml source url or location
+	
+	Returns:
+	
+		array
+	
 	*/
 	
 	
 	public static function parseConfig($x)
 	{
 		$r = array();
-		
 		$xml = simplexml_load_string($x);
+		
 		if($xml){
 			foreach($xml->option as $option){
 				$t = sprintf($option['name']);
 				$r[$t] = sprintf($option);
 			}
 		}
+		
 				
 		return $r;
 			
 	}
 	
-	/**
-	* checkArray
-	*
-	*
-	*
+	/*
+	
+	Function: checkArray
+	
+	Checks to see if an intersection exists for all vals
+	
+	Parameters:
+	
+		a:Array - main array
+		vals:Array - array of values to check for
+		
+	Returns:
+	
+		Boolean	
+	
 	*/
 	
 	public static function checkArray($a,$vals)
@@ -82,11 +118,21 @@ class Utils
 	
 	}
 	
-	/**
-	* arraySort
-	*
-	*
-	*
+	/*
+	
+	Function: arraySort
+	
+	Sorts an array on a supplied key
+	
+	Parameters:
+	
+		array:Array	- main array
+		key:String - key name
+	
+	Returns:
+	
+		sorted array
+	
 	*/
 	
 	public static function arraySort($array, $key)
@@ -103,11 +149,20 @@ class Utils
 	} 
 	
 	
-	/**
-	* formatHumanReadable
-	*
-	*
-	*
+	/*
+	
+	Function: formatHumanReadable
+	
+	Replaces underscores with spaces and uppercases first character
+	
+	Parameters:
+	
+		text:String - text
+	
+	Returns:
+	
+		formatted string	
+	
 	*/
 	
 	
@@ -118,13 +173,20 @@ class Utils
 		return $t;	
 	}
 	
-	/**
-	* removeDups
-	*
-	* @param	array	
-	*
-	* @return  array
-	*
+	/*
+	Function: removeDups
+	
+	Removes duplicates from a particular key of an array
+	
+	Parameters:
+	
+		array:Array - original array
+		row_element:String - string of key to check duplicates for
+	
+	Returns:
+	
+		formatted array
+	
 	*/
 	
 	
@@ -142,14 +204,21 @@ class Utils
 		return $new_array;
 	}
 	
-	/**
-	* getTimeDifference
-	* taken from blog posting
-	*
-	* @param   string   the prefix name
-	*
-	* @return  string   timestamp
-	*
+	/*
+	
+	Function: getTimeDifference
+	
+	Taken from blog posting, returns an array of days, hours, minutes, and seconds for a difference
+	
+	Parameters:
+		
+		start:String - a unix timestamp
+		end:String - a unix timestamp
+	
+	Returns:
+	
+		array of days, hours, minutes, and seconds for a difference
+		
 	*/
 	
 	function getTimeDifference($start,$end)
@@ -183,13 +252,21 @@ class Utils
 	}
 	
 	
-	/**
-	* assembleDateTime
-	*
-	* @param   string   the prefix name
-	*
-	* @return  string   timestamp
-	*
+	/*
+	
+	Function: assembleDateTime
+	
+	Mashes up various form elements into a dateTime, uses internal methods <assembleDate> and <assembleTime>
+	
+	Parameters:
+	
+		prefix:String - prefix of variable
+		name_space:String - namespace for variable
+		
+	Returns:
+	
+		Unix timestamp
+	
 	*/
 	
 	public static function assembleDateTime($prefix,$name_space)
@@ -197,13 +274,21 @@ class Utils
 		return self::assembleDate($prefix,$name_space) . " " . self::assembleTime($prefix,$name_space);	
 	}
 	
-	/**
-	* assembleDate
-	*
-	* @param   string   the prefix name
-	*
-	* @return  string   timestamp
-	*
+	/*
+	
+	Function: assembleDate
+	
+	Mashes up date form elements and returns portion of timestamp
+	
+	Parameters:
+	
+		prefix:String - prefix of variable
+		name_space:String - namespace for variable
+		
+	Returns:
+	
+		date portion of timestamp
+	
 	*/
 	
 	public static function assembleDate($prefix,$name_space)
@@ -215,13 +300,21 @@ class Utils
 		return $_POST[$t_y] . "-" . $_POST[$t_m] . "-" . $_POST[$t_d];
 	}
 	
-	/**
-	* assembleTime
-	*
-	* @param   string   the prefix name
-	*
-	* @return  string   timestamp
-	*
+	/*
+	
+	Function: assembleTime
+	
+	Mashes up time form elements and returns portion of timestamp
+	
+	Parameters:
+	
+		prefix:String - prefix of variable
+		name_space:String - namespace for variable
+		
+	Returns:
+	
+		time portion of timestamp
+	
 	*/
 	
 	public static function assembleTime($prefix,$name_space)
@@ -230,20 +323,22 @@ class Utils
 		$t_h = $name_space . $prefix . '_hour';
 		$t_ap = $name_space . $prefix . '_meridiem';
 		$t_min = $name_space . $prefix . '_minute';
-		
-		//die(print(self::time_12_24($_POST[$t_h],$_POST[$t_ap])));
-		
+				
 		return self::time12to24($_POST[$t_h],$_POST[$t_ap]) . ":" . $_POST[$t_min] . ":00";
 		
 	}
 	
 
-
-	/**
-	* now
-	*
-	* @return  string    now() timestamp
-	*
+	/*
+	
+	Function: now
+	
+	Generates timestamp from this very moment
+	
+	Returns:
+	
+		Unix timestamp of now
+	
 	*/
 	
 	public static function now()
@@ -251,11 +346,16 @@ class Utils
 		return date("Y-m-d H:i:s");
 	}
 	
-	/**
-	* date_today
-	* uses the values in the config.inc to set default hour and minute for today
-	* @return  string    timestamp
-	*
+	/*
+	
+	Function: dateToday
+	
+	Uses the values in the config.inc to set default hour and minute for today
+	
+	Returns:
+		
+		Unix timestamp of today (at CMS default hours and minutes)
+	
 	*/
 	
 	public static function dateToday()
@@ -265,11 +365,16 @@ class Utils
 		return date("Y-m-d H:i:s", mktime(CMS_DEFAULT_HOUR,CMS_DEFAULT_MIN,0,$dA[1],$dA[2],$dA[0]));
 	}
 	
-	/**
-	* date_now
-	* returns now, with seconds to 00
-	* @return  string    timestamp
-	*
+	/*
+	
+	Function: dateNow
+	
+	Creates timestamp of now and uses 00 for seconds
+	
+	Returns:
+		
+		Unix timestamp of now with 00 seconds
+	
 	*/
 	
 	public static function dateNow()
@@ -280,15 +385,20 @@ class Utils
 		return date("Y-m-d H:i:s", mktime($tA[0],$tA[1],0,$dA[1],$dA[2],$dA[0]));
 	}
 	
-	/**
-	* date_future
-	*
-	* sets a date y number of years in the future and return timestamp
-	*
-	* @param   string   num of years in future
-	*
-	* @return  string   timestamp  
-	*
+	/*
+	
+	Function: dateFuture
+	
+	Creates timestamp x number of years in the future
+	
+	Parameters:
+	
+		y:Number - years in the future
+	
+	Returns:
+		
+		date timestamp of a date in the future
+	
 	*/
 	
 	public static function dateFuture($y="5")
@@ -299,15 +409,20 @@ class Utils
 		//return date("Y-m-d", mktime(0,0,0,$dA[1],$dA[2],($dA[0] + 5)));
 	}
 	
-	/**
-	* date_new
-	*
-	* sets a date x number of days in the future
-	*
-	* @param   string   num of days in future
-	*
-	* @return  string   timestamp  
-	*
+	/*
+	
+	Function: dateNew
+	
+	Creates timestamp x number of days in the future
+	
+	Parameters:
+	
+		y:Number - days in the future
+	
+	Returns:
+		
+		date timestamp of a date in the future
+	
 	*/
 	
 	public static function dateNew($days=7)
@@ -318,15 +433,20 @@ class Utils
 	
 	}
 	
-	/**
-	* time_24_12
-	*
-	* used to break down timestamps into form pulldowns with am/pm
-	*
-	* @param   string   hours 00-23
-	*
-	* @return  string   time:AM/PM  
-	*
+	/*
+	
+	Function: time24to12
+	
+	used to break down timestamps into form pulldowns with am/pm
+	
+	Parameters:
+	
+		time:String - hours 00-23
+	
+	Returns:
+	
+		string of time:AM/PM  
+	
 	*/
 	
 	public static function time24to12($time)
@@ -339,16 +459,21 @@ class Utils
 		}
 	}
 	
-	/**
-	* time_12_24
-	*
-	* used to break down timestamps into form pulldowns with am/pm
-	*
-	* @param   string   hours 00-12
-	* @param   string   AM/PM
-	*
-	* @return  string   00-23 hours
-	*
+	/*
+	
+	Function: time12to24
+	
+	used to break down timestamps into form pulldowns with am/pm
+	
+ 	Parameters:
+ 	
+ 		time:String - hours 00-12
+		am_pm:String - AM/PM
+	
+	Returns:
+	
+		string 00-23 hours
+	
 	*/
 	
 	public static function time12to24($time,$am_pm)
@@ -361,13 +486,18 @@ class Utils
 		}
 	}
 	
-	/**
-	* human_file_size
-	*
-	* @param   number   the filesize in kbytes
-	*
-	* @return  string   filesize w/ units
-	*
+	/*
+	
+	Function: humanFileSize
+	
+	Parameters:
+	
+		size:Number - the filesize in kbytes
+	
+	Returns:
+	
+		string of filesize w/ units
+		
 	*/
 	
 	public static function humanFileSize($size)
@@ -376,13 +506,20 @@ class Utils
 		return round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i];
 	}
 	
-	/**
-	* list_directory
-	*
-	* @param   string   the directory to scan
-	*
-	* @return  array    multidimensional array of strings
-	*
+	/*
+	
+	Function: listDirectory
+	
+	Lists directory
+	
+	Parameters:
+	
+		dir:String - the directory to scan
+		
+	Returns:
+	
+		multidimensional array of strings
+		
 	*/
 	
 	public static function listDirectory($dir)
@@ -405,52 +542,23 @@ class Utils
 		 }
 	   }
 	   return $file_list;
-	 }
-	
-	/**
-	* sort_position
-	*
-	* @param   string   table name
-	* @param   string   sql record set query
-	* @param   string   record id
-	* @param   string   new position
-	*
-	* @return  null     
-	*
-	*/
-	
-	public static function sortPosition($table,$sql,$id,$pos){
-		
-		$q = db_query($sql);
-		
-		$tA = array();
-		for($i=0;$i<count($q);$i++){
-			if($id != $q[$i]['id']){
-				$tA[] = $q[$i]['id'];
-			}
-		
-		}
-			
-		array_splice($tA,($pos-1),0,$id);
-		
-		for($i=0;$i<count($tA);$i++){
-			$r_id = $tA[$i];
-			$tpos = $i+1;
-			db_query_simple("UPDATE `$table` SET position = $tpos WHERE id = '$r_id'");
-		}
-	
 	}
-		
-	/**
-	* setVar
-	*
-	* checks request to see if variable is not empty
-	*
-	* @param   string   the variable name
-	* @param   string   default initialize = ""
-	*
-	* @return  null    
-	*
+				
+	/*
+	
+	Function: setVar
+	
+	checks $_REQUEST to see if variable is not empty
+	
+	Parameters:
+	
+		var:String - the variable name
+		default:String - default value if blank
+	
+	Returns:
+	
+		value
+	
 	*/
 	
 	public static function setVar($var,$default="")
@@ -466,20 +574,23 @@ class Utils
 		
 	}
 	
-	/**
-	* setPost
-	*
-	* checks request to see if variable is not empty
-	*
-	* @param   string   the variable name
-	* @param   string   default initialize = ""
-	*
-	* @return  null    
-	*
+	/*
+	
+	Function: setPost
+	
+	checks $_POST to see if variable is not empty
+	
+	Parameters:
+	
+		var:String - the variable name
+		default:String - the default value if blank
+	
+	Returns:
+	
+		value
+		
 	*/
-	
-	//mysql_real_escape_string
-	
+		
 	public static function setPost($var,$default="")
 	{
 	
@@ -496,16 +607,20 @@ class Utils
 	}
 	
 	
-	/**
-	* super_local
-	*
-	* moves super to the local scope of a public static function
-	* uses mysql_real_escape_string
-	*
-	* @param   string   global, GET, POST, SESSION
-	*
-	* @return  object   the variable in the local scope    
-	*
+	/*
+	
+	Function: super_local
+	
+	moves super to the local scope of a public static function
+	
+	Parameters:
+	
+		super:String - global, GET, POST, SESSION
+		
+	Returns:
+	
+		the variable in the local scope    
+		
 	*/
 	
 	public static function super_local($super)
@@ -524,17 +639,20 @@ class Utils
 		return $r;
 	}
 	
+	/*
 	
+	Function: padZero
 	
-	/**
-	* pad_zero
-	*
-	* used to add a zero to numbers under 10
-	*
-	* @param   string   number 0-n
-	*
-	* @return  string   00-09 : n
-	*
+	used to add a zero to numbers under 10
+	
+	Parameters:
+	
+		n:String - number 0-n
+	
+	Returns:
+	
+		string 00-09 : n
+		
 	*/
 	
 	public static function padZero($n)
@@ -547,16 +665,17 @@ class Utils
 		}
 	}
 	
-	/**
-	* meta_refresh
-	*
-	* used to meta refresh to a new page
-	*
-	* @param   string   url
-	* @param   number   time
-	*
-	* @return  null
-	*
+	/*
+	
+	Function: metaRefresh
+	
+	used to meta refresh to a new page
+	
+	Parameters:
+	 
+	 	url:String - url
+	 	time:Number - time for redirect
+	
 	*/
 	
 	public static function metaRefresh($url,$time = 0)
@@ -564,17 +683,20 @@ class Utils
 		print '<meta http-equiv="refresh" content="'  . $time . '; url='  . $url . '" />';
 	}
 	
-	/**
-	* createthumb
-	* uses GD 2 to create jpeg thumbnails
-	*
-	* @param   string   thumbanil name
-	* @param   string   source filename
-	* @param   string   des width
-	* @param   string   des height
-	*
-	* @return  null     
-	*
+	/*
+	
+	Function: createThumb
+	
+	uses GD 2 to create jpeg thumbnails, constrains based upon width and height
+	
+	Parameters:
+	
+		src_name:String - source name
+		dst_name:String - new name
+		new_w:Number - new width
+		new_h:Number - new height
+		options:Array - mode (jpg||png), quality (0-100)
+	
 	*/
 	
 	public static function createThumb($src_name,$dst_name,$new_w,$new_h,$options)
