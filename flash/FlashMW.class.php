@@ -21,7 +21,12 @@ Class FlashMW
 		
 		$this->dom = new DomDocument;
 		$this->dom->preserveWhiteSpace = false;
-		$this->dom->loadXML($GLOBALS['HTTP_RAW_POST_DATA']);
+		
+		$inputSocket = fopen('php://input','rb');
+		$contents = stream_get_contents($inputSocket);
+		fclose($inputSocket);
+		//GLOBALS['HTTP_RAW_POST_DATA'] - does not work without php.ini tweaking
+		$this->dom->loadXML($contents);
 		
 		$this->response = array();
 		$this->errors = array();
