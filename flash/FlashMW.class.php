@@ -14,13 +14,13 @@ Class FlashMW
 	public $params;
 	public $payload;
 	
-	public function __construct($db='')
+	public function __construct($database)
 	{
 		
-		if($db==''){
+		if(!isset($database)){
 			$this->db = new AdaptorMysql();
 		}else{
-			$this->db = $db;
+			$this->db = $database;
 		}
 		
 		$this->dom = new DomDocument;
