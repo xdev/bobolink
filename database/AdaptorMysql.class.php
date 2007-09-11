@@ -56,7 +56,7 @@ class AdaptorMysql implements Db
 		if (!$this->connection){
 			die('Could not connect to the database: ' . mysql_error());
 		}
-		mysql_select_db($DB['db']);
+		mysql_select_db($DB['db'],$this->connection);
 	}
 	
 	/*
@@ -90,7 +90,7 @@ class AdaptorMysql implements Db
 	
 	public function sql($sql)
 	{
-		$r = mysql_query($sql) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
 		return $r;
 	}
 	
@@ -112,7 +112,7 @@ class AdaptorMysql implements Db
 	
 	public function queryRow($sql)
 	{
-		$r = mysql_query($sql) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
 		$tA = mysql_fetch_array($r,MYSQL_BOTH);
 				
 		if(mysql_num_rows($r) == 0){
@@ -142,7 +142,7 @@ class AdaptorMysql implements Db
 	
 	public function query($sql){
 	
-		$r = mysql_query($sql) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
 		if(mysql_num_rows($r) == 0){
 			return false;		
 		}else{		
@@ -210,7 +210,7 @@ class AdaptorMysql implements Db
 		
 		$sql .= "($i_cols) VALUES ($i_vals)";
 		
-		mysql_query($sql) or die(mysql_error() . "<p class=\"error\">$sql</p>");
+		mysql_query($sql,$this->connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
 		
 		return $sql;
 	
@@ -251,7 +251,7 @@ class AdaptorMysql implements Db
 		}
 		
 		$sql .= "$update WHERE `$k` = '$v'";
-		mysql_query($sql) or die(mysql_error() . "<p class=\"error\">$sql</p>");
+		mysql_query($sql,$this->connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
 		
 		return $sql;
 	
@@ -275,7 +275,7 @@ class AdaptorMysql implements Db
 		
 	public function getInsertId($table){
 		
-		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'");
+		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'",$this->connection);
 		$row = mysql_fetch_assoc($q);
 		return intval($row['Auto_increment']);
 	
