@@ -681,6 +681,7 @@ class Utils
 	public static function metaRefresh($url,$time = 0)
 	{	
 		print '<meta http-equiv="refresh" content="'  . $time . '; url='  . $url . '" />';
+		die();
 	}
 	
 	/*
@@ -732,6 +733,12 @@ class Utils
 		}
 		
 		imagecopyresampled($dst_img,$src_img,0,0,0,0,$thumb_w,$thumb_h,$old_x,$old_y); 
+		
+		if(!(isset($options['output_mode']))){
+			$options['output_mode'] = $options['mode'];
+		}else{
+			$options['mode'] = $options['output_mode'];
+		}
 		
 		if($options['mode'] == 'png'){
 			imageSaveAlpha($dst_img, true);

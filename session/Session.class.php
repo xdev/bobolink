@@ -59,10 +59,7 @@ class Session
 	
 	public function setVar($name,$value)
 	{
-		//session_name("s_id");
-		//session_start();
 		$_SESSION[$name] = $value;
-		//print "<p class=\"error\">SESSION SET - $name=>$value</p>";
 	}
 	
 	/*
@@ -83,9 +80,6 @@ class Session
 	
 	public function getVar($name)
 	{
-		//session_name("s_id");
-		//session_start();
-		//print "<p class=\"error\">SESSION GET - $name=>$_SESSION[$name]</p>";
 		if(isset($_SESSION[$name])){
 			return $_SESSION[$name];
 		}else{
