@@ -753,7 +753,52 @@ class Utils
 		imagedestroy($src_img); 
 	}
 	
-
+	/*
 	
+	Function: downloadFile
+	
+	Sends headers to download a file. Attempts to find a matching MIME type otherwise used application/force-download
+	
+	Parameters:
+	
+		file:String - complete path and filename
+	
+	*/
+	
+	public static function downloadFile($file)
+	{
+	
+		$file_extension = strtolower(substr(strrchr($file,"."),1));
+
+		switch ($file_extension) {
+			case "pdf": $ctype="application/pdf"; break;
+			case "exe": $ctype="application/octet-stream"; break;
+			case "zip": $ctype="application/zip"; break;
+			case "doc": $ctype="application/msword"; break;
+			case "xls": $ctype="application/vnd.ms-excel"; break;
+			case "ppt": $ctype="application/vnd.ms-powerpoint"; break;
+			case "gif": $ctype="image/gif"; break;
+			case "png": $ctype="image/png"; break;
+			case "jpeg":
+			case "jpg": $ctype="image/jpg"; break;
+			default: $ctype="application/force-download";
+		}
+
+		if (!file_exists($file)) {
+			die("NO FILE HERE");
+		}
+	
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Cache-Control: private",false);
+		header("Content-Type: $ctype");
+		header("Content-Disposition: attachment; filename=\"".basename($file)."\";");
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Length: ".@filesize($file));
+		set_time_limit(0);
+		readfile($file);
+		exit();
+	}
 }
 ?>
