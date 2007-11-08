@@ -168,9 +168,12 @@ class Utils
 	
 	public static function formatHumanReadable($text)
 	{
-		$t = preg_replace('[_]',' ',$text);
-		$t = strtoupper($t{0}) . substr($t,1);
-		return $t;	
+			if ($t = preg_replace('[_]',' ',$text)) {
+				$t = strtoupper($t{0}) . substr($t,1);
+				return $t;
+			} else {
+				return $text;
+			}
 	}
 	
 	/*
