@@ -19,13 +19,6 @@ Typical use is as follows
 class Forms
 {
 
-	public $db;
-	
-	public function setDb($database)
-	{
-		$this->db = $database;
-	}
-	
 	/*
 	
 	Function: listManager
@@ -376,7 +369,7 @@ class Forms
 		(isset($options['validate'])) ? $class .= ' validate ' . $options['validate'] : '';
 		
 		$value = preg_replace('["]',htmlentities('"'),$value);
-		self::buildElement($name,"<input type=\"$type\" class=\"$class\" name=\"$name\" id=\"$name\" value=\"$value\" size=\"$size\" maxlength=\"$max\" />",$options);
+		self::buildElement($name,'<input type="' . $type . '" class="' . $class . '" name="' . $name . '" id="' . $name . '" value="' . $value . '" size="' . $size . '" maxlength="' . $max . '" />',$options);
 	
 	}
 	
@@ -526,7 +519,7 @@ class Forms
 	*
 	*/
 	
-	public function selectDefault($name,$value,$options)
+	public static function selectDefault($name,$value,$options)
 	{
 		(isset($options['select_sql'])) ? $data_source = $options['select_sql'] : $data_source = false;
 		(isset($options['col_value'])) ? $col_value = $options['col_value'] : $col_value = "id";
@@ -538,7 +531,7 @@ class Forms
 		
 		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
 		$r .= '<option value="">(none)</option>';
-		$q = $this->db->query($data_source);
+		$q = $options['db']->query($data_source);
 		$dA = explode("|",$col_display);
 		
 		//$r .= "<option value=\"0\">(none)</option>";
@@ -647,14 +640,14 @@ class Forms
 	
 	*/
 	
-	public function selectState($name="state",$value,$options)
+	public static function selectState($name="state",$value,$options)
 	{
 		(isset($options['country'])) ? $country = $options['country'] : $country = 227;
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
 		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
-		$q = $this->db->query("SELECT * FROM cms_states WHERE country_id = '$country' ORDER BY name");
+		$q = $options['db']->query("SELECT * FROM cms_states WHERE country_id = '$country' ORDER BY name");
 		
 		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
 		$r .= "<option value=\"0\">----------</option>";
@@ -684,13 +677,13 @@ class Forms
 	
 	*/
 	
-	public function selectCountry($name="country",$value,$options)
+	public static function selectCountry($name="country",$value,$options)
 	{
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
 		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
-		$q = $this->db->query("SELECT * FROM `cms_countries` WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
+		$q = $options['db']->query("SELECT * FROM `cms_countries` WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
 		$tl = count($q);
 		$r = '<select name="'.$name.'" id="'.$name.'" class="'. $class . '" '. $onchange . '>';
 			
@@ -703,7 +696,7 @@ class Forms
 		
 		$r .= "<option value=\"0\">----------------------------------</option>";
 		
-		$q = $this->db->query("SELECT * FROM `cms_countries` WHERE active = 1");
+		$q = $options['db']->query("SELECT * FROM `cms_countries` WHERE active = 1");
 		$tl = count($q);
 			
 		for($i=0;$i<$tl;$i++){

@@ -64,6 +64,35 @@ Class FlashMW
 		
 	
 	}
+	
+	public function formatRecord($row,$options='')
+	{
+		$r = '';
+		if(!isset($options['rows'])){
+			foreach($row as $key=>$value){
+				if(!is_numeric($key)){
+					$r .= '<' . $key . '><![CDATA[' . $value . ']]></' . $key . '>';
+				}
+			}
+		}else{
+			foreach($options['rows'] as $key){
+				$r .= '<' . $key . '><![CDATA[' . $row[$key] . ']]></' . $key . '>';
+			}			
+		}
+		return $r;
+	}
+	
+	public function formatRecordSet($recordSet,$options='')
+	{
+		$r = '<RecordSet Type="' . $options['name'] . '">';
+		foreach($recordSet as $row){
+			$r .= '<Row>';
+			$r .= $this->formatRecord($row,$options);
+			$r .= '</Row>';
+		}
+		$r .= '</RecordSet>';
+		return $r;
+	}
 		
 	public function sendResponse()
 	{

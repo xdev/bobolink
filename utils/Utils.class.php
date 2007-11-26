@@ -137,15 +137,21 @@ class Utils
 	
 	public static function arraySort($array, $key)
 	{
+		$sortedA = array();
+		$sortvaluesA = array();
+		
 		for ($i = 0; $i < sizeof($array); $i++) { 
-			$sort_values[$i] = $array[$i][$key]; 
-		 } 
-		asort ($sort_values); 
-		reset ($sort_values); 
-		while (list ($arr_key, $arr_val) = each ($sort_values)) { 
-			$sorted_arr[] = $array[$arr_key]; 
-		} 
-		return $sorted_arr; 
+			$sortvaluesA[$i] = $array[$i][$key]; 
+		}
+		
+		asort ($sortvaluesA); 
+		reset ($sortvaluesA); 
+		
+		while (list ($arr_key, $arr_val) = each ($sortvaluesA)) { 
+			$sortedA[] = $array[$arr_key]; 
+		}
+		 
+		return $sortedA; 
 	} 
 	
 	
@@ -224,7 +230,7 @@ class Utils
 		
 	*/
 	
-	function getTimeDifference($start,$end)
+	public static function getTimeDifference($start,$end)
 	{
 		$uts['start']      =    strtotime( $start );
 		$uts['end']        =    strtotime( $end );
@@ -754,6 +760,61 @@ class Utils
 		
 		imagedestroy($dst_img); 
 		imagedestroy($src_img); 
+	}
+	
+	/*
+	
+	Function: stringToHex
+	
+	Converts string to hexidecimal
+	Paul Tero, July 2001
+	http://www.tero.co.uk/des/
+	
+	Parameters:
+	
+		s:String - string value		
+	
+	Returns:
+	
+		hexadecimal of string    
+		
+	*/
+	
+	public static function stringToHex($s)
+	{
+		$r = "0x";
+		$hexes = array ("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f");
+		for ($i=0; $i<strlen($s); $i++) {
+			$r .= ($hexes [(ord($s{$i}) >> 4)] . $hexes [(ord($s{$i}) & 0xf)]);
+		}
+		return $r;
+	}
+	
+	/*
+	
+	Function: hexToString
+	
+	Converts hex string regular characters
+	Paul Tero, July 2001
+	http://www.tero.co.uk/des/
+	
+	Parameters:
+	
+		h:String - hex string value		
+	
+	Returns:
+	
+		string    
+		
+	*/
+
+	public static function hexToString($h)
+	{
+		$r = "";
+		for ($i= (substr($h, 0, 2)=="0x")?2:0; $i<strlen($h); $i+=2) {
+			$r .= chr (base_convert (substr ($h, $i, 2), 16, 10));
+		}
+		return $r;
 	}
 	
 	/*
