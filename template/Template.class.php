@@ -2,9 +2,9 @@
 
 /*
 
-Class: Template
-
 $Id$
+
+Class: Template
 
 Collection of general template functions
 

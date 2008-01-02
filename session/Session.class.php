@@ -2,6 +2,8 @@
 
 /*
 
+$Id$
+
 Class: Session
 
 Collection of functions for general session handling.
