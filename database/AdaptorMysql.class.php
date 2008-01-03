@@ -71,7 +71,8 @@ class AdaptorMysql implements Db
 	
 	public function closeConnection()
 	{
-		mysql_close($this->connection);
+		//mysql_close($this->connection);
+		// Reading up on this says it may not be a good idea to close the connection since it already closes it when the script stops running - and if more than one connection is made (it doesn't actually open more than one connection), closing one will close all of them).
 	}
 	
 	/*
