@@ -22,11 +22,11 @@ class Template
 	public $page;
 	public $pageClass;
 	
-	public function __construct()
+	public function __construct($db=null)
 	{
 		require_once LIB . 'database/Db.interface.php';
 		require_once LIB . 'database/AdaptorMysql.class.php';
-		$this->db = new AdaptorMysql();
+		$this->db = $db ? $db : new AdaptorMysql();
 		$this->siteConfig();
 		$this->page();
 	}
@@ -43,7 +43,9 @@ class Template
 	
 	*/
 	
-	private function siteConfig($table = 'site_config')
+	private function siteConfig(
+		$table = 'site_config'
+	)
 	{
 		if ($this->db->query("
 			SHOW TABLES LIKE '".$table."'
@@ -74,7 +76,7 @@ class Template
 		$this->requestUri = $this->requestUri();
 		// Check URL to make sure it exists
 		if ($this->error404 = ($this->page['id'] = $this->pageId()) ? false : true) {
-			$this->page['name'] = 'Error 404';
+			$this->page['title'] = 'Error 404';
 			header('HTTP/1.0 404 Not Found');
 		}
 		// Set TPL path
@@ -92,11 +94,18 @@ class Template
 			if (file_exists($_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/'.$this->page['tpl'].'.php')) {
 				$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/'.$this->page['tpl'].'.php';
 			} else {
+				$this->page['tpl'] = '_generic';
 				$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/_generic.php';
 			}
 		} else {
 			// If the page doesn't exist, use the Error 404 tpl file
+			$this->page['tpl'] = '_error404';
+			$this->page['template'] = '1';
 			$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/_error404.php';
+		}
+		// If homepage, define other necessary page variables
+		if ($this->page['tpl'] == 'home') {
+			$this->page['template'] = 1;
 		}
 	}
 	
@@ -139,17 +148,21 @@ class Template
 	
 	*/
 	
-	private function pageId($parentId=0,$level=0,$id=0)
+	private function pageId(
+		$parentId=0,
+		$level=0,
+		$id=0
+	)
 	{
 		if ($this->requestUri[0] == '') {
 			return -1;
 		} else {
 			if (isset($this->requestUri[$level])) {
 				if ($q = $this->db->queryRow("
-					SELECT id,name,slug,parent_id
+					SELECT id,title,slug,parent
 					FROM site_map
 					WHERE active = '1'
-						AND parent_id = '".$parentId."'
+						AND parent = '".$parentId."'
 						AND slug IN ('".$this->requestUri[$level]."','*')
 				")) {
 					if ($q['slug'] == '*') return $q['id'];
@@ -159,6 +172,72 @@ class Template
 				return $id;
 			}
 		}
+	}
+	
+	/*
+	
+	Function: file
+	
+	Determine which template file to use
+	
+	Returns:
+	
+		string
+	
+	*/
+	
+	public function file()
+	{
+		if (isset($this->page['template']) && $q = $this->db->queryRow("
+			SELECT file
+			FROM site_templates
+			WHERE active = '1'
+				AND id = '".$this->page['template']."'
+		")) {
+			return 'php/templates/'.$q['file'].'.php';
+		} else {
+			die('Template not found.');
+		}
+	}
+	
+	/*
+	
+	Function: htmlTitle
+	
+	Create the appropriate title for the <head> section
+	
+	Parameters:
+	
+		site_name:String - Name of the website
+		separator:String - string to separate site name from page title
+		position:Numeric - (0) to put page title before site name, (1) for after
+		home_title:String - optional/alternate page title for homepage
+	
+	Returns:
+	
+		formatted string
+	
+	*/
+	
+	public function htmlTitle(
+		$site_name = 'Site Name',
+		$separator = ' | ',
+		$position = 1,
+		$home_title = null
+	)
+	{
+		if ($this->page['id'] == -1) {
+			// If homepage, determine which title to use
+			$r = $home_title ? $home_title : $site_name;
+		} else {
+			// Set html title
+			if ($this->page['title']) {
+				$r = $position ? $site_name.$separator.$this->page['title'] : $this->page['title'].$separator.$site_name;
+			} else {
+				$r = $site_name;
+			}
+		}
+		return $r;
 	}
 	
 	/*

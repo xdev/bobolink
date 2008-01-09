@@ -506,9 +506,9 @@ class Forms
 	
 	/*
 	
-	Function: select 
+	Function: selectDefault
 	
-	builds a select dropdown based upon infor for a query
+	builds a select dropdown based upon info for a query
 	
 	*
 	* @param   string   label
@@ -523,47 +523,120 @@ class Forms
 	
 	public static function selectDefault($name,$value,$options)
 	{
-		(isset($options['select_sql'])) ? $data_source = $options['select_sql'] : $data_source = false;
-		(isset($options['col_value'])) ? $col_value = $options['col_value'] : $col_value = "id";
-		(isset($options['col_display'])) ? $col_display = $options['col_display'] : $col_display = "name";
-		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
-		(isset($options['class'])) ? $class = $options['class'] : $class = "";
+		$data_source = isset($options['select_sql']) ? $options['select_sql'] : false;
+		$col_value = isset($options['col_value']) ? $options['col_value'] : "id";
+		$col_display = isset($options['col_display']) ? $options['col_display'] : "name";
+		$class = (isset($options['class']) ? $options['class'] : '') . (isset($options['validate']) ? ' validate ' . $options['validate'] : '');
 		
-		(isset($options['validate'])) ? $class .= ' validate ' . $options['validate'] : '';
-		
-		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
+		$r = sprintf(
+			'<select name="%s" id="%s" class="%s" %s>',
+			$name,
+			$name,
+			$class,
+			isset($options['onchange']) ? "onchange=\"$options[onchange]\"" : ''
+		);
 		$r .= '<option value="">(none)</option>';
-		$q = $options['db']->query($data_source);
 		$dA = explode("|",$col_display);
 		
-		//$r .= "<option value=\"0\">(none)</option>";
-		if($q){
-			for($i=0;$i<count($q);$i++){
-		
-				$item = $q[$i];
+		if ($q = $options['db']->query($data_source)) {
+			foreach ($q as $row) {
 				
-				(trim($value) == trim($item[$col_value])) ? $selected = "selected=\"selected\"" : $selected = "";	
-				$tv = $item[$col_value];
-				if(count($dA) > 1){
+				(trim($value) == trim($row[$col_value])) ? $selected = "selected=\"selected\"" : $selected = "";
+				$tv = $row[$col_value];
+				if (count($dA) > 1) {
 					$td = "";
-					for($j=0;$j<count($dA);$j++){
-						$td .= $item[$dA[$j]];
-						if($j<count($dA) - 1){
+					for ($j=0;$j<count($dA);$j++) {
+						$td .= $row[$dA[$j]];
+						if ($j<count($dA) - 1) {
 							$td .= " - ";
 						}
 					}
-				}else{
-				
-					$td = $item[$col_display];
+				} else {
+					$td = $row[$col_display];
 				}
 				
 				$r .= "<option value=\"$tv\" $selected >$td</option>";
 			
 			}
 		}
-	
+		
 		$r .= "</select>";
+		
+		self::buildElement($name,$r,$options);
+	}
 	
+	/*
+	
+	Function: selectParent
+	
+	builds a nested select dropdown based upon info for a query
+	
+	*
+	* @param   string   label
+	* @param   string   variable name
+	* @param   string   sql record set query
+	* @param   string   col for value
+	* @param   string   col for display ( can be multiple w/ | )
+	* @param   string   value
+	* @param   string   javascript onchange
+	*
+	*/
+	
+	public static function selectParent($name,$value,$options)
+	{
+		$data_source = isset($options['select_sql']) ? $options['select_sql'] : false;
+		$col_value = isset($options['col_value']) ? $options['col_value'] : "id";
+		$col_display = isset($options['col_display']) ? $options['col_display'] : "name";
+		$class = (isset($options['class']) ? $options['class'] : '') . (isset($options['validate']) ? ' validate ' . $options['validate'] : '');
+		
+		$r = sprintf(
+			'<select name="%s" id="%s" class="%s" %s>',
+			$name,
+			$name,
+			$class,
+			isset($options['onchange']) ? "onchange=\"$options[onchange]\"" : ''
+		);
+		$r .= '<option value="">(none)</option>';
+		
+		function getChildren($name,$value,$options,$parent=0,$depth='',$parent_field_name='parent_id')
+		{
+			//if (isset($options['parent_field_name']) && $options['parent_field_name']) ;
+			$dA = explode("|",$options['col_display']);
+			$r = '';
+			if ($q = $options['db']->query(str_replace('ORDER BY','WHERE '.$parent_field_name.' = '.$parent.' ORDER BY',$options['select_sql']))) {
+				
+				foreach ($q as $row) {
+					(trim($value) == trim($row[$options['col_value']])) ? $selected = "selected=\"selected\"" : $selected = "";
+					$tv = $row[$options['col_value']];
+					if (count($dA) > 1) {
+						$td = "";
+						for ($j=0;$j<count($dA);$j++) {
+							$td .= $row[$dA[$j]];
+							if ($j<count($dA) - 1) {
+								$td .= " - ";
+							}
+						}
+					} else {
+						$td = $row[$options['col_display']];
+					}
+				
+					$r .= sprintf(
+						'<option value="%s" %s>%s</option>',
+						$tv,
+						$selected,
+						$depth.$td
+					);
+					$r .= getChildren($name,$value,$options,$row[$options['col_value']],$depth.'— ',$parent_field_name);
+			
+				}
+			}
+			return $r;
+		}
+		
+		$r .= getChildren($name,$value,$options,0,'',$options['parent_field_name']);
+		
+		$r .= "</select>";
+		
 		self::buildElement($name,$r,$options);
 	}
 	
