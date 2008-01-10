@@ -6,7 +6,7 @@ $Id$
 
 Class: Template
 
-Collection of general template functions
+Collection of general template functions 
 
 */
 
