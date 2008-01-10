@@ -535,26 +535,50 @@ class Utils
 	
 	public static function listDirectory($dir)
 	{
-	   $file_list = '';
-	   $stack[] = $dir;
-	   while ($stack) {
-		 $current_dir = array_pop($stack);
-		 if ($dh = opendir($current_dir)) {
-		   while (($file = readdir($dh)) !== false) {
-			 if ($file !== '.' AND $file !== '..') {
-			   $current_file = "{$current_dir}/{$file}";
-			   if (is_file($current_file)) {
-				 $file_list[] = "{$current_dir}/{$file}";
-			   } elseif (is_dir($current_file)) {
-				 $stack[] = $current_file;
-			   }
-			 }
-		   }
-		 }
-	   }
-	   return $file_list;
+		$file_list = '';
+		$stack[] = $dir;
+		while ($stack) {
+			$current_dir = array_pop($stack);
+			if ($dh = opendir($current_dir)) {
+				while (($file = readdir($dh)) !== false) {
+					if ($file !== '.' AND $file !== '..') {
+						$current_file = "{$current_dir}/{$file}";
+						if (is_file($current_file)) {
+							$file_list[] = "{$current_dir}/{$file}";
+						} elseif (is_dir($current_file)) {
+							$stack[] = $current_file;
+						}
+					}
+				}
+			}
+		}
+		return $file_list;
 	}
-				
+	
+	/*
+	
+	Function: validateDirectory
+	
+	Checks if upload directory exists. If not, the directory is created.
+	
+	Parameters:
+	
+		dir:String - the directory to check
+		permissions:Integer - directory permissions (defaults to 0755)
+		
+	Returns:
+	
+		dir
+		
+	*/
+	
+	public static function validateDirectory($dir,$permissions=0755)
+	{
+		// if the upload directory doesn't exist, create it
+		if(!is_dir($dir)) mkdir($dir,$permissions,true);
+		return $dir;
+	}
+	
 	/*
 	
 	Function: setVar
