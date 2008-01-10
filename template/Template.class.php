@@ -100,12 +100,12 @@ class Template
 		} else {
 			// If the page doesn't exist, use the Error 404 tpl file
 			$this->page['tpl'] = '_error404';
-			$this->page['template'] = '1';
+			$this->page['template_id'] = 1;
 			$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/_error404.php';
 		}
 		// If homepage, define other necessary page variables
 		if ($this->page['tpl'] == 'home') {
-			$this->page['template'] = 1;
+			$this->page['template_id'] = 1;
 		}
 	}
 	
@@ -159,10 +159,10 @@ class Template
 		} else {
 			if (isset($this->requestUri[$level])) {
 				if ($q = $this->db->queryRow("
-					SELECT id,title,slug,parent
+					SELECT id,title,slug,parent_id
 					FROM site_map
 					WHERE active = '1'
-						AND parent = '".$parentId."'
+						AND parent_id = '".$parentId."'
 						AND slug IN ('".$this->requestUri[$level]."','*')
 				")) {
 					if ($q['slug'] == '*') return $q['id'];
@@ -188,11 +188,11 @@ class Template
 	
 	public function file()
 	{
-		if (isset($this->page['template']) && $q = $this->db->queryRow("
+		if (isset($this->page['template_id']) && $q = $this->db->queryRow("
 			SELECT file
 			FROM site_templates
 			WHERE active = '1'
-				AND id = '".$this->page['template']."'
+				AND id = '".$this->page['template_id']."'
 		")) {
 			return 'php/templates/'.$q['file'].'.php';
 		} else {
