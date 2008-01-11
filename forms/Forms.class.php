@@ -327,7 +327,7 @@ class Forms
 		// Set file URI
 		$file_path = defined('UPLOAD_PATH') ? UPLOAD_PATH : (isset($options['file_path']) ? $options['file_path'] : '/files');
 		$file_path .= (isset($options['table']) && isset($options['col_name'])) ? '/'.$options['table'].'/'.$options['col_name'].'/' : '';
-		$file_name .= isset($options['file_prefix']) ? $options['file_prefix'] : '';
+		$file_name = isset($options['file_prefix']) ? $options['file_prefix'] : '';
 		switch (isset($options['file_key']) ? $options['file_key'] : ''):
 			case 'value':
 				$file_name .= $value;
@@ -336,7 +336,7 @@ class Forms
 				$file_name .= $options['id'];
 			break;
 		endswitch;
-		$file_name .= isset($options['file_extension']) ? $options['file_extension'] : '';
+		$file_name .= $file_name && isset($options['file_extension']) ? $options['file_extension'] : '';
 		// File input
 		$r = sprintf(
 			'<input type="file" class="file" id="%s" name="%s" />',

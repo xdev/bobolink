@@ -1,15 +1,12 @@
 <?php
 
-/*
+/* $Id$ */
 
-$Id$
+define("BOBOLINK_VERSION","1.0");
+define("BOBOLINK_REVISION",substr('$Revision$',11,-2));
 
-*/
-
-define("LIB_VERSION","1.0");
 /*
 
 set something up about the version number of front end required
 
 */
-?>
