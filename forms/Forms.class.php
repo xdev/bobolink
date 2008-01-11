@@ -324,25 +324,20 @@ class Forms
 	
 	public static function fileField($name,$value="",$options)
 	{
-		// Set file options
-		$options['file_prefix'] = isset($options['file_prefix']) ? $options['file_prefix'] : '';
-		if (isset($options['file_key'])) {
-			switch ($options['file_key']):
-				case 'value':
-					$options['file_key'] = $value;
-				break;
-				default:
-					$options['file_key'] = $options['id'];
-				break;
-			endswitch;
-		} else {
-			$options['file_key'] = $options['id'];
-		}
-		$options['file_extension'] = isset($options['file_extension']) ? $options['file_extension'] : '';
-		$options['file_preview'] = isset($options['file_preview']) ? $options['file_preview'] : '';
 		// Set file URI
-		$file = '/files/'.$options['table'].'/'.$options['col_name'].'/'.$options['file_prefix'].$options['file_key'].$options['file_extension'];
-		// File field
+		$file_path = defined('UPLOAD_PATH') ? UPLOAD_PATH : (isset($options['file_path']) ? $options['file_path'] : '/files');
+		$file_path .= (isset($options['table']) && isset($options['col_name'])) ? '/'.$options['table'].'/'.$options['col_name'].'/' : '';
+		$file_name .= isset($options['file_prefix']) ? $options['file_prefix'] : '';
+		switch (isset($options['file_key']) ? $options['file_key'] : ''):
+			case 'value':
+				$file_name .= $value;
+			break;
+			case 'id':
+				$file_name .= $options['id'];
+			break;
+		endswitch;
+		$file_name .= isset($options['file_extension']) ? $options['file_extension'] : '';
+		// File input
 		$r = sprintf(
 			'<input type="file" class="file" id="%s" name="%s" />',
 			$name,
@@ -351,22 +346,39 @@ class Forms
 		// If file already uploaded, include delete and additional markup
 		if ($value) {
 			$r = sprintf(
-				'<a href="%s">View/download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;<input type="checkbox" id="%s_delete" name="%s_delete" />&nbsp;Delete file&nbsp;&nbsp;|&nbsp;&nbsp;Replace file: %s',
-				$file,
+				'<input type="checkbox" id="%s_delete" name="%s_delete" />&nbsp;<label for="%s_delete">Delete file</label>&nbsp;&nbsp;|&nbsp;&nbsp;Replace file: %s',
+				$name,
 				$name,
 				$name,
 				$r
 			);
-			// If preview config is set, show preview of file.
-			if (isset($options['file_preview'])) {
-				switch ($options['file_preview']):
-					case 'jpg':
-						$r .= sprintf(
-							'<br /><img src="%s" alt="JPG" />',
-							$file
-						);
-					break;
-				endswitch;
+			// Make sure file exists before linking to it
+			if ($file_name) {
+				if (file_exists($_SERVER['DOCUMENT_ROOT'].$file_path.$file_name)) {
+					$r = sprintf(
+						'<a href="%s">View/download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;%s',
+						$file_path.$file_name,
+						$r
+					);
+					// If preview config is set, show preview of file.
+					if (isset($options['file_preview'])) {
+						switch ($options['file_preview']):
+							case 'jpg':
+								$r .= sprintf(
+									'<br /><img src="%s" alt="JPG" />',
+									$file_path.$file_name
+								);
+							break;
+						endswitch;
+					}
+				} else {
+					// Let user know if file doesn't exist
+					$r .= sprintf(
+						'<br /><em>FILE NOT FOUND:</em>&nbsp;<a href="%s">%s</a>',
+						$file_path.$file_name,
+						$file_path.$file_name
+					);
+				}
 			}
 		}
 		self::buildElement($name,$r,$options);
