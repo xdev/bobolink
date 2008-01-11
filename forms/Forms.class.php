@@ -324,7 +324,52 @@ class Forms
 	
 	public static function fileField($name,$value="",$options)
 	{
-		self::buildElement($name,"<input type=\"file\" class=\"file\" id=\"$name\" name=\"$name\" />",$options);
+		// Set file options
+		$options['file_prefix'] = isset($options['file_prefix']) ? $options['file_prefix'] : '';
+		if (isset($options['file_key'])) {
+			switch ($options['file_key']):
+				case 'value':
+					$options['file_key'] = $value;
+				break;
+				default:
+					$options['file_key'] = $options['id'];
+				break;
+			endswitch;
+		} else {
+			$options['file_key'] = $options['id'];
+		}
+		$options['file_extension'] = isset($options['file_extension']) ? $options['file_extension'] : '';
+		$options['file_preview'] = isset($options['file_preview']) ? $options['file_preview'] : '';
+		// Set file URI
+		$file = '/files/'.$options['table'].'/'.$options['col_name'].'/'.$options['file_prefix'].$options['file_key'].$options['file_extension'];
+		// File field
+		$r = sprintf(
+			'<input type="file" class="file" id="%s" name="%s" />',
+			$name,
+			$name
+		);
+		// If file already uploaded, include delete and additional markup
+		if ($value) {
+			$r = sprintf(
+				'<a href="%s">View/download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;<input type="checkbox" id="%s_delete" name="%s_delete" />&nbsp;Delete file&nbsp;&nbsp;|&nbsp;&nbsp;Replace file: %s',
+				$file,
+				$name,
+				$name,
+				$r
+			);
+			// If preview config is set, show preview of file.
+			if (isset($options['file_preview'])) {
+				switch ($options['file_preview']):
+					case 'jpg':
+						$r .= sprintf(
+							'<br /><img src="%s" alt="JPG" />',
+							$file
+						);
+					break;
+				endswitch;
+			}
+		}
+		self::buildElement($name,$r,$options);
 	}
 	
 	/*
