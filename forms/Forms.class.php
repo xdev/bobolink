@@ -356,7 +356,7 @@ class Forms
 			if ($file_name) {
 				if (file_exists($_SERVER['DOCUMENT_ROOT'].$file_path.$file_name)) {
 					$r = sprintf(
-						'<a href="%s">View/download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;%s',
+						'<a href="%s" target="_blank" title="opens file in a new window">View/download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;%s',
 						$file_path.$file_name,
 						$r
 					);
