@@ -13,7 +13,7 @@ Collection of general template functions
 class Template
 {
 	
-	private $db;
+	public $db;
 	public $requestUri;
 	
 	public $error404;
@@ -166,12 +166,52 @@ class Template
 						AND slug IN ('".$this->requestUri[$level]."','*')
 				")) {
 					if ($q['slug'] == '*') return $q['id'];
-					else return $this->pageId($q['id'],$level+1,$q['id']);;
+					else return $this->pageId($q['id'],$level+1,$q['id']);
 				}
 			} else {
 				return $id;
 			}
 		}
+	}
+	
+	/*
+	
+	Function: pageUri
+	
+	Determine the DB page uri for the requested page id
+	
+	Parameters:
+	
+		id:Integer - page id
+		uri:string - the current page uri
+	
+	Returns:
+	
+		string
+	
+	*/
+	
+	public function pageUri(
+		$id=0,
+		$uri=''
+	)
+	{
+		//if ($this->requestUri[0] == '') {
+		//	return -1;
+		//} else {
+			//if ($childId) {
+				if ($id && $q = $this->db->queryRow("
+					SELECT id,title,slug,parent_id
+					FROM site_map
+					WHERE active = '1'
+						AND id = '".$id."'
+				")) {
+					if ($q['slug'] == '*') return $uri;
+					else return $this->pageUri($q['parent_id'],$q['slug'].($uri ? '/' : '').$uri);
+				} else {
+					return '/'.$uri;
+				}
+		//}
 	}
 	
 	/*
