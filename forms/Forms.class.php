@@ -660,7 +660,16 @@ class Forms
 			//if (isset($options['parent_field_name']) && $options['parent_field_name']) ;
 			$dA = explode("|",$options['col_display']);
 			$r = '';
-			if ($q = $options['db']->query(str_replace('ORDER BY','WHERE '.$parent_field_name.' = '.$parent.' ORDER BY',$options['select_sql']))) {
+			if (strpos($options['select_sql'],'ORDER BY')) {
+				$sql = str_replace(
+					'ORDER BY',
+					(strpos($options['select_sql'],'WHERE') ? 'AND ' : 'WHERE ').$parent_field_name.' = '.$parent.' ORDER BY',
+					$options['select_sql']
+				);
+			} else {
+				$sql = $options['select_sql'].(strpos($options['select_sql'],'WHERE') ? ' AND ' : ' WHERE ').$parent_field_name.' = '.$parent;
+			}
+			if ($q = $options['db']->query($sql)) {
 				
 				foreach ($q as $row) {
 					(trim($value) == trim($row[$options['col_value']])) ? $selected = "selected=\"selected\"" : $selected = "";
