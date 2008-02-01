@@ -196,22 +196,17 @@ class Template
 		$uri=''
 	)
 	{
-		//if ($this->requestUri[0] == '') {
-		//	return -1;
-		//} else {
-			//if ($childId) {
-				if ($id && $q = $this->db->queryRow("
-					SELECT id,title,slug,parent_id
-					FROM site_map
-					WHERE active = '1'
-						AND id = '".$id."'
-				")) {
-					if ($q['slug'] == '*') return $uri;
-					else return $this->pageUri($q['parent_id'],$q['slug'].($uri ? '/' : '').$uri);
-				} else {
-					return '/'.$uri;
-				}
-		//}
+		if ($id && $q = $this->db->queryRow("
+			SELECT id,title,slug,parent_id
+			FROM site_map
+			WHERE active = '1'
+				AND id = '".$id."'
+		")) {
+			if ($q['slug'] == '*') return $uri;
+			else return $this->pageUri($q['parent_id'],$q['slug'].($uri ? '/' : '').$uri);
+		} else {
+			return '/'.$uri;
+		}
 	}
 	
 	/*
