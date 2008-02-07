@@ -583,6 +583,7 @@ class Forms
 		$data_source = isset($options['select_sql']) ? $options['select_sql'] : false;
 		$col_value = isset($options['col_value']) ? $options['col_value'] : "id";
 		$col_display = isset($options['col_display']) ? $options['col_display'] : "name";
+		$col_display_separator = isset($options['col_display_separator']) ? $options['col_display_separator'] : ' - ';
 		$class = (isset($options['class']) ? $options['class'] : '') . (isset($options['validate']) ? ' validate ' . $options['validate'] : '');
 		
 		$r = sprintf(
@@ -605,7 +606,7 @@ class Forms
 					for ($j=0;$j<count($dA);$j++) {
 						$td .= $row[$dA[$j]];
 						if ($j<count($dA) - 1) {
-							$td .= " - ";
+							$td .= $col_display_separator;
 						}
 					}
 				} else {
@@ -644,6 +645,7 @@ class Forms
 		$data_source = isset($options['select_sql']) ? $options['select_sql'] : false;
 		$col_value = isset($options['col_value']) ? $options['col_value'] : "id";
 		$col_display = isset($options['col_display']) ? $options['col_display'] : "name";
+		$col_display_separator = isset($options['col_display_separator']) ? $options['col_display_separator'] : ' - ';
 		$class = (isset($options['class']) ? $options['class'] : '') . (isset($options['validate']) ? ' validate ' . $options['validate'] : '');
 		
 		$r = sprintf(
@@ -679,7 +681,7 @@ class Forms
 						for ($j=0;$j<count($dA);$j++) {
 							$td .= $row[$dA[$j]];
 							if ($j<count($dA) - 1) {
-								$td .= " - ";
+								$td .= $col_display_separator;
 							}
 						}
 					} else {
