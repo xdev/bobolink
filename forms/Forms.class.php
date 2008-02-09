@@ -328,7 +328,7 @@ class Forms
 		$file_path = defined('UPLOAD_PATH') ? UPLOAD_PATH : (isset($options['file_path']) ? $options['file_path'] : '/files');
 		$file_path .= (isset($options['table']) && isset($options['col_name'])) ? '/'.$options['table'].'/'.$options['col_name'].'/' : '';
 		$file_name = isset($options['file_prefix']) ? $options['file_prefix'] : '';
-		switch (isset($options['file_key']) ? $options['file_key'] : ''):
+		switch (isset($options['file_key']) ? $options['file_key'] : 'value'):
 			case 'value':
 				$file_name .= $value;
 			break;
