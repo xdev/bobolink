@@ -758,7 +758,7 @@ class Forms
 	public static function selectStatic($name,$value,$options)
 	{	
 		(isset($options['dataA'])) ? $dataA = $options['dataA'] : $dataA = array();
-		(isset($options['onchange'])) ? $onchange = "onchange=\"$otions[onchange]\"" : $onchange = "";
+		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		
 		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
