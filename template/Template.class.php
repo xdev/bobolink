@@ -148,7 +148,7 @@ class Template
 	
 	*/
 	
-	private function pageId(
+	public function pageId(
 		$parentId=0,
 		$level=0,
 		$id=0

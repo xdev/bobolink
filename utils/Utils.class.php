@@ -185,6 +185,47 @@ class Utils
 	}
 	
 	/*
+	
+	Function: niceDates
+	
+	Produce human-readable date format
+	* DayName, Day Month Year 'l, j M Y'
+	* DayName, Day Month Year, Time 'l, j M Y, g:ia'
+	* DayName, Day Month Year — DayName, Day Month Year 'l, j M Y' + ' — l, j M Y'
+	
+	Parameters:
+	
+		start:String - start date
+		end:String - end date
+		d:String - date format
+		t:String - time format
+	
+	*/
+	
+	public static function niceDates($start=null,$end=null,$options = null)
+	{
+		if ($start) {
+			if (!isset($options['d_format'])) $options['d_format'] = 'l, j M Y';
+			if (!isset($options['d_separator'])) $options['d_separator'] = ' — ';
+			if (!isset($options['t_format'])) $options['t_format'] = 'g:ia';
+			if (!isset($options['t_separator'])) $options['t_separator'] = ' - ';
+			if (!isset($options['dt_separator'])) $options['dt_separator'] = ', ';
+			if ($start && strpos($start,'-')) $start = strtotime($start);
+			if ($end && strpos($end,'-')) $end = strtotime($end);
+			//die($start.' '.$end);
+			if ($start > $end) $end = null;
+			// if no end date, we really don't have much work to do here
+			if ($end && $start != $end) {
+				if (date('Ymj',$start) == date('Ymj',$end)) {
+					return date($options['d_format'].$options['dt_separator'].$options['t_format'],$start).date($options['t_separator'].$options['t_format'],$end);
+				}
+				return date($options['d_format'],$start).date($options['d_separator'].$options['d_format'],$end);
+			}
+			return date($options['d_format'].(date('Hi') == '0000' ? $options['dt_separator'].$options['t_format'] : ''),$start);
+		}
+	}
+	
+	/*
 	Function: removeDups
 	
 	Removes duplicates from a particular key of an array
