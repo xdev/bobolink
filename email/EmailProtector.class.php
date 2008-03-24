@@ -19,9 +19,14 @@ class EmailProtector
 	private	$_em_key;
 	private	$mode;
 	
-	public function __construct()
+	public function __construct($m=true)
 	{
 		$this->_em_key = substr(sha1(microtime()),0,24);
+		if($m === false){
+			$this->mode = 'file';
+		}else{
+			$this->mode = 'native';
+		}
 	}
 	
 	public function printKey()
@@ -36,11 +41,17 @@ class EmailProtector
 	
 	private function encodeEmail($matches)
 	{
-		$iv_size = mcrypt_get_iv_size(MCRYPT_TRIPLEDES, MCRYPT_MODE_CBC);
-		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-		$str = $matches[1].'@'.$matches[2];
-		$e = mcrypt_encrypt(MCRYPT_TRIPLEDES,$this->_em_key,$str,MCRYPT_MODE_CBC,$iv);
-		return 'href="#send_email" rev="em_' . strlen($str) . '_' . substr(Utils::stringToHex($e),2) . '_' . substr(Utils::stringToHex($iv),2) . '" class="em_encrypted" ';
+		if($this->mode == 'native'){
+			$iv_size = mcrypt_get_iv_size(MCRYPT_TRIPLEDES, MCRYPT_MODE_CBC);
+			$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+			$str = $matches[1].'@'.$matches[2];
+			$e = mcrypt_encrypt(MCRYPT_TRIPLEDES,$this->_em_key,$str,MCRYPT_MODE_CBC,$iv);
+			return 'href="#send_email" rev="em_' . strlen($str) . '_' . substr(Utils::stringToHex($e),2) . '_' . substr(Utils::stringToHex($iv),2) . '" class="em_encrypted_native" ';
+		}
+		if($this->mode == 'file'){
+			$enc = substr(stringToHex(des($this->_em_key,$matches[1].'@'.$matches[2],1,0,null)),2);
+			return 'href="#send_email" rev="em_' . $enc . '" class="em_encrypted_file" ';
+		}
 	}
 	
 	public function formatEmail($txt='')
