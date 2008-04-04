@@ -779,10 +779,13 @@ class Utils
 	public static function createThumb($src_name,$dst_name,$new_w,$new_h,$options)
 	{
 		if($options['mode'] == 'jpg'){
-			$src_img=imagecreatefromjpeg($src_name);
+			$src_img=ImageCreateFromJpeg($src_name);
 		}
 		if($options['mode'] == 'png'){
-			$src_img=ImageCreateFromPNG($src_name);
+			$src_img=ImageCreateFromPng($src_name);
+		}
+		if($options['mode'] == 'gif'){
+			$src_img=ImageCreateFromGif($src_name);
 		}
 		
 		$old_x=imageSX($src_img);
@@ -800,7 +803,6 @@ class Utils
 			$thumb_w=$new_w;
 			$thumb_h=$new_h;
 		}
-		
 		
 		$dst_img=ImageCreateTrueColor($thumb_w,$thumb_h);
 		
@@ -823,6 +825,10 @@ class Utils
 		
 		if($options['mode'] == 'jpg'){
 			imagejpeg($dst_img,$dst_name,$options['quality']); 
+		}
+				
+		if($options['mode'] == 'gif'){
+			imagegif($dst_img,$dst_name,$options['quality']); 
 		}		
 		
 		imagedestroy($dst_img); 
