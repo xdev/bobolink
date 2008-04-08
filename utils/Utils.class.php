@@ -503,10 +503,11 @@ class Utils
 	
 	public static function time24to12($time)
 	{
-	
-		if($time > 12){
+		if ($time > 12) {
 			return (12 - (24 - $time)) . ":PM";
-		}else{
+		} elseif ($time == 12) {
+			return 12 . ":PM";
+		} else {
 			return $time . ":AM";
 		}
 	}
@@ -530,10 +531,9 @@ class Utils
 	
 	public static function time12to24($time,$am_pm)
 	{
-	
-		if($am_pm == "PM"){
-			return(12 + $time);
-		}else{
+		if ($am_pm == "PM" && $time != 12) {
+			return (12 + $time);
+		} else {
 			return $time;
 		}
 	}
