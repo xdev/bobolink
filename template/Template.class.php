@@ -100,21 +100,22 @@ class Template
 	*/
 	
 	public function pageId(
+		$table=null,
 		$parentId=0,
 		$level=0,
 		$id=0
 	)
 	{
-		if (isset($this->requestUri[$level])) {
+		if ($table && isset($this->requestUri[$level])) {
 			if ($q = $this->db->queryRow("
 				SELECT id,title,slug,parent_id
-				FROM site_map
+				FROM $table
 				WHERE active = '1'
 					AND parent_id = '".$parentId."'
 					AND slug IN ('".$this->requestUri[$level]."','*')
 			")) {
 				if ($q['slug'] == '*') return $q['id'];
-				else return $this->pageId($q['id'],$level+1,$q['id']);
+				else return $this->pageId($table,$q['id'],$level+1,$q['id']);
 			}
 		} else {
 			return $id;
