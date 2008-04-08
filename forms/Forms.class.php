@@ -230,7 +230,7 @@ class Forms
 		
 		printf(
 			'
-			<div class="form_item" id="form_item_%s" %s>
+			<div class="%s" id="form_item_%s" %s>
 				<label for="%s"%s>%s</label>
 				<div class="input">
 					%s
@@ -238,6 +238,7 @@ class Forms
 				</div>
 			</div>
 			',
+			isset($options['class_main']) ? 'form_item '.$options['class_main'] : 'form_item',
 			$name,
 			isset($options['style_main']) ? 'style="' . $options['style_main'] . '"' : '',
 			$name,
