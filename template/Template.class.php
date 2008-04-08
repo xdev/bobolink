@@ -27,8 +27,6 @@ class Template
 		require_once LIB . 'database/Db.interface.php';
 		require_once LIB . 'database/AdaptorMysql.class.php';
 		$this->db = $db ? $db : new AdaptorMysql();
-		$this->siteConfig();
-		$this->page();
 	}
 	
 	/*
@@ -43,7 +41,7 @@ class Template
 	
 	*/
 	
-	private function siteConfig(
+	public function siteConfig(
 		$table = 'site_config'
 	)
 	{
@@ -64,53 +62,6 @@ class Template
 	
 	/*
 	
-	Function: page
-	
-	Load page into memory
-	
-	*/
-	
-	private function page()
-	{
-		// Get URI request and put it into an array
-		$this->requestUri = $this->requestUri();
-		// Check URL to make sure it exists
-		if ($this->error404 = ($this->page['id'] = $this->pageId()) ? false : true) {
-			$this->page['title'] = 'Error 404';
-			header('HTTP/1.0 404 Not Found');
-		}
-		// Set TPL path
-		$tpl_path = defined('TPL') ? TPL : 'php/tpl';
-		// Load page variables
-		if ($this->page['id'] < 0 || ($this->page['id'] && $this->page = $this->db->queryRow("
-			SELECT *
-			FROM ".TABLE_SITE_MAP."
-			WHERE active = '1'
-				AND id = '".$this->page['id']."'
-		"))) {
-			// Determine which TPL file to use
-			if ($this->page['id'] < 0 || !$this->page['tpl']) $this->page['tpl'] = $this->requestUri[0] ? implode('.',$this->requestUri) : 'home';
-			// If actual TPL file doesn't exist, use a generic one
-			if (file_exists($_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/'.$this->page['tpl'].'.php')) {
-				$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/'.$this->page['tpl'].'.php';
-			} else {
-				$this->page['tpl'] = '_generic';
-				$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/_generic.php';
-			}
-		} else {
-			// If the page doesn't exist, use the Error 404 tpl file
-			$this->page['tpl'] = '_error404';
-			$this->page['template_id'] = 1;
-			$this->page['tpl_file'] = $_SERVER['DOCUMENT_ROOT'].'/'.$tpl_path.'/_error404.php';
-		}
-		// If homepage, define other necessary page variables
-		if ($this->page['tpl'] == 'home') {
-			$this->page['template_id'] = 1;
-		}
-	}
-	
-	/*
-	
 	Function: requestUri
 	
 	Strip any queries from the request URI and return an array
@@ -121,7 +72,7 @@ class Template
 	
 	*/
 	
-	private function requestUri()
+	public function requestUri()
 	{
 		$uri = (($qsa = strpos($_SERVER['REQUEST_URI'],'?')) ? substr($_SERVER['REQUEST_URI'],0,$qsa) : $_SERVER['REQUEST_URI']);
 		$uri = explode("/",$uri);
@@ -154,23 +105,19 @@ class Template
 		$id=0
 	)
 	{
-		if ($this->requestUri[0] == '') {
-			return -1;
-		} else {
-			if (isset($this->requestUri[$level])) {
-				if ($q = $this->db->queryRow("
-					SELECT id,title,slug,parent_id
-					FROM site_map
-					WHERE active = '1'
-						AND parent_id = '".$parentId."'
-						AND slug IN ('".$this->requestUri[$level]."','*')
-				")) {
-					if ($q['slug'] == '*') return $q['id'];
-					else return $this->pageId($q['id'],$level+1,$q['id']);
-				}
-			} else {
-				return $id;
+		if (isset($this->requestUri[$level])) {
+			if ($q = $this->db->queryRow("
+				SELECT id,title,slug,parent_id
+				FROM site_map
+				WHERE active = '1'
+					AND parent_id = '".$parentId."'
+					AND slug IN ('".$this->requestUri[$level]."','*')
+			")) {
+				if ($q['slug'] == '*') return $q['id'];
+				else return $this->pageId($q['id'],$level+1,$q['id']);
 			}
+		} else {
+			return $id;
 		}
 	}
 	
@@ -209,31 +156,7 @@ class Template
 		}
 	}
 	
-	/*
 	
-	Function: file
-	
-	Determine which template file to use
-	
-	Returns:
-	
-		string
-	
-	*/
-	
-	public function file()
-	{
-		if (isset($this->page['template_id']) && $q = $this->db->queryRow("
-			SELECT file
-			FROM site_templates
-			WHERE active = '1'
-				AND id = '".$this->page['template_id']."'
-		")) {
-			return 'php/templates/'.$q['file'].'.php';
-		} else {
-			die('Template not found.');
-		}
-	}
 	
 	/*
 	
@@ -261,16 +184,16 @@ class Template
 		$home_title = null
 	)
 	{
-		if ($this->page['id'] == -1) {
-			// If homepage, determine which title to use
-			$r = $home_title ? $home_title : $site_name;
-		} else {
+		if ($this->page['id']) {
 			// Set html title
 			if ($this->page['title']) {
 				$r = $position ? $site_name.$separator.$this->page['title'] : $this->page['title'].$separator.$site_name;
 			} else {
 				$r = $site_name;
 			}
+		} else {
+			// If homepage, determine which title to use
+			$r = $home_title ? $home_title : $site_name;
 		}
 		return $r;
 	}
