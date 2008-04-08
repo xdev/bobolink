@@ -191,6 +191,12 @@ class Template
 			} else {
 				$r = $site_name;
 			}
+		} elseif ($this->error404) {
+			if ($this->page['title']) {
+				$r = $position ? $site_name.$separator.$this->page['title'] : $this->page['title'].$separator.$site_name;
+			} else {
+				$r = $position ? $site_name.$separator.'Error 404' : 'Error 404'.$separator.$site_name;
+			}
 		} else {
 			// If homepage, determine which title to use
 			$r = $home_title ? $home_title : $site_name;
