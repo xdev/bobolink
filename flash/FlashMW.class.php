@@ -28,47 +28,51 @@ Class FlashMW
 		}else{
 			$this->db = $database;
 		}
-		
-		$this->dom = new DomDocument;
-		$this->dom->preserveWhiteSpace = false;
-		
-		$inputSocket = fopen('php://input','rb');
-		$contents = stream_get_contents($inputSocket);
-		fclose($inputSocket);
-		//GLOBALS['HTTP_RAW_POST_DATA'] - does not work without php.ini tweaking
-		$this->dom->loadXML($contents);
-		
-		$this->response = array();
-		$this->errors = array();
-		
-		//action
-		$this->action = $this->dom->firstChild->getAttribute('Type');
-		
-		//payload
-		if($this->payload = $this->dom->getElementsByTagName('Payload')->item(0)){
-			
+		if(isset($_REQUEST['debug']) && isset($_REQUEST['action'])){
+			$this->action = $_REQUEST['action'];
+			header('Content-Type: text');
 		}else{
-			$this->payload = null;
-		}
-				
-		//params			
-		if($params = $this->dom->getElementsByTagName('Param')){
+		
+			$this->dom = new DomDocument;
+			$this->dom->preserveWhiteSpace = false;
+		
+			$inputSocket = fopen('php://input','rb');
+			$contents = stream_get_contents($inputSocket);
+			fclose($inputSocket);
+			//GLOBALS['HTTP_RAW_POST_DATA'] - does not work without php.ini tweaking
+			$this->dom->loadXML($contents);
+		
+			$this->response = array();
+			$this->errors = array();
+		
+			//action
+			$this->action = $this->dom->firstChild->getAttribute('Type');
+		
+			//payload
+			if($this->payload = $this->dom->getElementsByTagName('Payload')->item(0)){
 			
-			$this->params = array();
-			foreach($params as $param)
-			{
-				$t = $param->getAttribute('Name');
-				if($param->hasChildNodes()){
-					$this->params[$t] = $param->firstChild->nodeValue;
-				}else{
-					$this->params[$t] = '';
-				}	
+			}else{
+				$this->payload = null;
+			}
+				
+			//params			
+			if($params = $this->dom->getElementsByTagName('Param')){
+			
+				$this->params = array();
+				foreach($params as $param)
+				{
+					$t = $param->getAttribute('Name');
+					if($param->hasChildNodes()){
+						$this->params[$t] = $param->firstChild->nodeValue;
+					}else{
+						$this->params[$t] = '';
+					}	
+				}
+		
 			}
 		
 		}
-		
-		
-	
+			
 	}
 	
 	public function formatRecord($row,$options='')
