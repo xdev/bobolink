@@ -594,7 +594,9 @@ class Forms
 			$class,
 			isset($options['onchange']) ? "onchange=\"$options[onchange]\"" : ''
 		);
-		$r .= '<option value="">(none)</option>';
+		if(!isset($options['allow_null']) || $options['allow_null'] === true){
+			$r .= '<option value="">(none)</option>';
+		}
 		$dA = explode("|",$col_display);
 		
 		if ($q = $options['db']->query($data_source)) {
