@@ -533,6 +533,8 @@ class Utils
 	{
 		if ($am_pm == "PM" && $time != 12) {
 			return (12 + $time);
+		} elseif ($am_pm == "AM" && $time == 12) {
+			return ($time - 12);
 		} else {
 			return $time;
 		}
