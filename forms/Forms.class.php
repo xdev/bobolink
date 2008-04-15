@@ -998,9 +998,10 @@ class Forms
 		
 		$r = '<select name="' . $name . '_hour" class="noparse" >';
 		
-		for($i=1;$i<13;$i++){
+		$r .= "<option value=\"12\">12</option>"; // Start with 12
+		for($i=1;$i<12;$i++){
 			($i == $time[0] || ($time[0] == 0 && $i == 12)) ? $selected="selected=\"selected\"" : $selected = "";
-			$r .= "<option value=\"$i\" $selected >$i</option>";
+			$r .= "<option value=\"$i\" $selected >".(strlen($i)==1 ? '&nbsp;' : '')."$i</option>";
 		}
 		
 		

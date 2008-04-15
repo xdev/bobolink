@@ -212,16 +212,33 @@ class Utils
 			if (!isset($options['dt_separator'])) $options['dt_separator'] = ', ';
 			if ($dtstart && strpos($dtstart,'-')) $dtstart = strtotime($dtstart);
 			if ($dtend && strpos($dtend,'-')) $dtend = strtotime($dtend);
-			//die($dtstart.' '.$dtend);
-			if ($dtstart >= $dtend) $dtend = null;
-			// if no end date, we really don't have much work to do here
-			if ($dtend && $dtstart != $dtend) {
-				if (date('Ymj',$dtstart) == date('Ymj',$dtend)) {
-					return date($options['d_format'].$options['dt_separator'].$options['t_format'],$dtstart).date($options['t_separator'].$options['t_format'],$dtend);
-				}
-				return date($options['d_format'],$dtstart).date($options['d_separator'].$options['d_format'],$dtend);
+			
+			// Make sure event doesn't end before it starts!
+			if ($dtstart > $dtend) $dtend = $dtstart;
+			// See if event is all day or starts/ends at the same time (endless)
+			if ($dtstart == $dtend || (date('Ymd',$dtstart) == date('Ymd',$dtend) && date('Hi',$dtstart) == '0000' && date('Hi',$dtend) == '2359')) {
+				$r = date($options['d_format'],$dtstart).(date('Hi',$dtstart) == '0000' ? '' : date($options['dt_separator'].$options['t_format'],$dtstart));
 			}
-			return date($options['d_format'].(date('Hi') == '0000' ? '' : $options['dt_separator'].$options['t_format']),$dtstart);
+			// Same day, different start/end times
+			elseif (date('Ymd',$dtstart) == date('Ymd',$dtend)) {
+				$r = date($options['d_format'].$options['dt_separator'].$options['t_format'],$dtstart).date($options['t_separator'].$options['t_format'],$dtend);
+			}
+			// Multiple all-day event
+			elseif (date('Hi',$dtstart) == '0000' && (date('Hi',$dtend) == '0000' || date('Hi',$dtend) == '2359')) {
+				$dtend = date('Hi',$dtend) == '0000' ? $dtend-86400 : $dtend;
+				if (date('Ymd',$dtstart) == date('Ymd',$dtend)) {
+					$r = date($options['d_format'],$dtstart);
+				}
+				else {
+					$r = date($options['d_format'],$dtstart).$options['d_separator'].date($options['d_format'],$dtend);
+				}
+			}
+			// Multi-day event
+			else {
+				//$r = date($options['d_format'].$options['dt_separator'].$options['t_format'],$dtstart).$options['d_separator'].date($options['d_format'].$options['dt_separator'].$options['t_format'],$dtend);
+				$r = date($options['d_format'],$dtstart).$options['d_separator'].date($options['d_format'],$dtend);
+			}
+			return $r;
 		}
 	}
 	
