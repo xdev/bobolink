@@ -840,7 +840,7 @@ class Forms
 			$r .= "<option value=\"$row[id]\" $selected >$row[name]</option>";
 		}
 		
-		$r .= "<option value=\"0\">----------------------------------</option>";
+		$r .= "<option value=\"0\" disabled=\"disabled\">----------------------------------</option>";
 		
 		$q = $options['db']->query("SELECT * FROM `cms_countries` WHERE active = 1");
 		$tl = count($q);
