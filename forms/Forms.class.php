@@ -761,6 +761,17 @@ class Forms
 	public static function selectStatic($name,$value,$options)
 	{	
 		(isset($options['dataA'])) ? $dataA = $options['dataA'] : $dataA = array();
+		
+		if(isset($options['data_csv'])){
+			$tA = explode(',',$options['data_csv']);
+			if(!isset($options['allow_null']) || $options['allow_null'] === true){
+				$dataA[] = array('(none)','');
+			}
+			foreach($tA as $row){
+				$dataA[] = array($row,$row);
+			}
+		}
+		
 		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
 		

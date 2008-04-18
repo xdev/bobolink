@@ -69,8 +69,9 @@ class Utils
 	
 	public static function parseConfig($x)
 	{
+		
 		$r = array();
-		$xml = simplexml_load_string($x);
+		$xml = new SimpleXMLElement($x);
 		
 		if($xml){
 			foreach($xml->option as $option){
@@ -78,8 +79,7 @@ class Utils
 				$r[$t] = sprintf($option);
 			}
 		}
-		
-				
+						
 		return $r;
 			
 	}
@@ -101,8 +101,10 @@ class Utils
 	
 	*/
 	
-	public static function checkArray($a,$vals)
-	{
+	public static function checkArray($a,$vals,$all=false)
+	{	
+		$rA = array();
+		
 		foreach($a as $row){
 			
 			$tA = array();
@@ -112,12 +114,19 @@ class Utils
 				}
 			}
 			if(count($tA) == count($vals)){
-				return $row;
+				if($all === true){
+					$rA[] = $row;
+				}else{
+					return $row;
+				}
 			}
 		
 		}
-		return false;
-	
+		
+		if(count($rA) > 0){
+			return $rA;
+		}		
+		return false;	
 	}
 	
 	/*
@@ -176,12 +185,12 @@ class Utils
 	
 	public static function formatHumanReadable($text)
 	{
-			if ($t = preg_replace('[_]',' ',$text)) {
-				$t = strtoupper($t{0}) . substr($t,1);
-				return $t;
-			} else {
-				return $text;
-			}
+		if ($t = preg_replace('[_]',' ',$text)) {
+			$t = strtoupper($t{0}) . substr($t,1);
+			return $t;
+		} else {
+			return $text;
+		}
 	}
 	
 	/*
@@ -797,6 +806,8 @@ class Utils
 	
 	public static function createThumb($src_name,$dst_name,$new_w,$new_h,$options)
 	{
+		//need to build in the checkDirectory on the destination
+		
 		if($options['mode'] == 'jpg'){
 			$src_img=ImageCreateFromJpeg($src_name);
 		}
@@ -882,6 +893,7 @@ class Utils
 		return $r;
 	}
 	
+	
 	/*
 	
 	Function: hexToString
@@ -907,6 +919,147 @@ class Utils
 			$r .= chr (base_convert (substr ($h, $i, 2), 16, 10));
 		}
 		return $r;
+	}
+	
+	public static function uploadFile($name=null,$value=null,$options)
+	{
+		// Set file_root
+		$file_root = (isset($options['file_root']) ? $options['file_root'].'/' : WEB_ROOT);
+		// Set file_path
+		if (isset($options['file_path'])) $file_path = $options['file_path'].'/';
+		else {
+			$file_path =  defined('UPLOAD_PATH') ? UPLOAD_PATH.'/' : 'files/';
+			$file_path .= (isset($options['table']) && isset($options['col_name'])) ? $options['table'].'/'.$options['col_name'].'/' : '';
+		}
+		// Set file_prefix
+		$file_prefix = isset($options['file_prefix']) ? $options['file_prefix'] : '';
+		// Set file_suffix
+		$file_suffix = isset($options['file_suffix']) ? $options['file_suffix'] : '';
+		// Make sure file was actually uploaded
+		if (is_uploaded_file($_FILES[$name]['tmp_name'])) {
+			// Set file_extension
+			$file_extension = isset($options['file_extension']) ? $options['file_extension'] : substr($_FILES[$name]['name'],strrpos($_FILES[$name]['name'],'.'));
+			// Set file_name
+			if (isset($options['file_key'])) {
+				switch ($options['file_key']):
+					case 'id':
+						$file_name = $options['id'];
+					break;
+					default:
+						$file_name = substr($_FILES[$name]['name'],0,strrpos($_FILES[$name]['name'],'.'));
+					break;
+				endswitch;
+			} else {
+				$file_name = substr($_FILES[$name]['name'],0,strrpos($_FILES[$name]['name'],'.'));
+			}
+			// Set dir & ext
+			$dir = self::validateDirectory($file_root.$file_path).'/';
+			$ext = $file_extension;
+			// Set file -- Check to see if file already exists on server
+			
+			//$file = $file_prefix.$file_name.$file_suffix;
+			
+			$file = self::checkFileName($dir,$file_prefix.$file_name.$file_suffix,$ext,$options);
+			if (move_uploaded_file($_FILES[$name]['tmp_name'],$dir.$file.$ext)) {
+				return $file.$ext;
+			}
+		}
+	}
+	
+	public static function checkFileName($dir,$file,$ext,$options)
+	{
+		if (file_exists($dir.$file.$ext) && $q = $options['db']->query("
+			SELECT ".$options['col_name']."
+			FROM ".$options['table']."
+			WHERE id != '".$options['id']."'
+				AND ".$options['col_name']." = '".$file.$ext."'
+		")) {
+			if (is_numeric($i = substr($file,strrpos($file,'_')+1))) $file = substr($file,0,strrpos($file,'_')+1).($i+1);
+			else $file .= '_1';
+			return self::checkFileName($dir,$file,$ext,$options);
+		} else {
+			return $file;
+		}
+	}
+	
+	public static function validateFile($file,$options)
+	{
+		//first check to see if it's in the valid file type
+		$tA = $options;
+		$ext = strtolower(substr($file['name'],strrpos($file['name'],'.')+1));
+				
+		$errorsA = array();
+		
+		//File Format (extension)
+		if(isset($tA['formats'])){
+			//split it on ,
+			$format = false;
+			$tB = explode(',',$tA['formats']);
+			if(count($tB)>0){
+				//check to see if it exists
+				if(in_array($ext,$tB)){
+					$format = true;
+				}
+			}else if($ext == $tA['formats']){
+				$format = true;
+			}			
+			
+			if($format == true){
+			
+			}else{
+				$errorsA[] = 'Incorrect File Format. File must be of type ['.$tA['formats'].'].';
+			}
+		}
+		
+		if(isset($tA['check_dimensions']) && $tA['check_dimensions'] == 'true'){
+			$image_dimensions = getimagesize($file['tmp_name']);
+			if(isset($tA['height'])){
+				if($image_dimensions[1] == $tA['height']){
+				
+				}else{
+					$errorsA[] = 'Incorrect File Height. File must = '.$tA['height'].' px tall.';
+				}
+			}
+			
+			if(isset($tA['width'])){
+				if($image_dimensions[0] == $tA['width']){
+					
+				}else{
+					$errorsA[] = 'Incorrect File Width. File must = '.$tA['width'].' px wide.';
+				}
+				
+			}
+			
+			if(isset($tA['max_height'])){
+				if($image_dimensions[1] <= $tA['max_height']){
+				
+				}else{
+					$errorsA[] = 'Incorrect File Height. File must be <= '.$tA['max_height'].' px tall.';
+				}
+			}
+			
+			if(isset($tA['max_width'])){
+				if($image_dimensions[0] <= $tA['max_width']){
+					
+				}else{
+					$errorsA[] = 'Incorrect File Width. File must be <= '.$tA['max_width'].' px wide.';
+				}
+				
+			}
+											
+		}
+		
+		if(isset($tA['check_size']) && $tA['check_size'] == 'true'){
+			//
+		}
+		
+		if(count($errorsA) > 0){
+			return $errorsA;
+		}else{
+			return true;
+			//all good
+		}
+		
 	}
 	
 	/*
