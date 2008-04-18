@@ -982,77 +982,105 @@ class Utils
 		}
 	}
 	
+	public static function checkDimensions($file,$options)
+	{
+		$image_dimensions = getimagesize($file['tmp_name']);
+		$errorsA = array();
+		
+		if(isset($options['height'])){
+			if($image_dimensions[1] == $options['height']){
+			
+			}else{
+				$errorsA[] = 'Incorrect File Height. File must = '.$options['height'].' px tall.';
+			}
+		}
+		
+		if(isset($options['width'])){
+			if($image_dimensions[0] == $options['width']){
+				
+			}else{
+				$errorsA[] = 'Incorrect File Width. File must = '.$options['width'].' px wide.';
+			}
+			
+		}
+		
+		if(isset($options['max_height'])){
+			if($image_dimensions[1] <= $options['max_height']){
+			
+			}else{
+				$errorsA[] = 'Incorrect File Height. File must be <= '.$options['max_height'].' px tall.';
+			}
+		}
+		
+		if(isset($options['max_width'])){
+			if($image_dimensions[0] <= $options['max_width']){
+				
+			}else{
+				$errorsA[] = 'Incorrect File Width. File must be <= '.$options['max_width'].' px wide.';
+			}
+			
+		}
+		
+		if(count($errorsA) > 0){
+			return $errorsA;
+		}else{
+			return true;
+		}
+		
+	}
+	
 	public static function validateFile($file,$options)
 	{
 		//first check to see if it's in the valid file type
-		$tA = $options;
 		$ext = strtolower(substr($file['name'],strrpos($file['name'],'.')+1));
 				
 		$errorsA = array();
 		
 		//File Format (extension)
-		if(isset($tA['formats'])){
+		if(isset($options['formats'])){
 			//split it on ,
 			$format = false;
-			$tB = explode(',',$tA['formats']);
+			$tB = explode(',',$options['formats']);
 			if(count($tB)>0){
 				//check to see if it exists
 				if(in_array($ext,$tB)){
 					$format = true;
 				}
-			}else if($ext == $tA['formats']){
+			}else if($ext == $options['formats']){
 				$format = true;
 			}			
 			
 			if($format == true){
 			
 			}else{
-				$errorsA[] = 'Incorrect File Format. File must be of type ['.$tA['formats'].'].';
+				$errorsA[] = 'Incorrect File Format. File must be of type ['.$options['formats'].'].';
 			}
 		}
 		
-		if(isset($tA['check_dimensions']) && $tA['check_dimensions'] == 'true'){
-			$image_dimensions = getimagesize($file['tmp_name']);
-			if(isset($tA['height'])){
-				if($image_dimensions[1] == $tA['height']){
-				
-				}else{
-					$errorsA[] = 'Incorrect File Height. File must = '.$tA['height'].' px tall.';
+		if(isset($options['dimensions'])){
+			//loop through to see what fits
+			$safe_size = false;
+			$t_errors = array();
+			foreach($options['dimensions'] as $dimension){
+				$t = self::checkDimensions($file,$dimension);
+				if($t===true){
+					$safe_size = true;
+					break;						
+				}else if(is_array($t)){
+					$t_errors = array_merge($t_errors,$t);
 				}
 			}
-			
-			if(isset($tA['width'])){
-				if($image_dimensions[0] == $tA['width']){
-					
-				}else{
-					$errorsA[] = 'Incorrect File Width. File must = '.$tA['width'].' px wide.';
-				}
-				
+			if($safe_size === false){
+				$errorsA = array_merge($errorsA,$t_errors);
 			}
-			
-			if(isset($tA['max_height'])){
-				if($image_dimensions[1] <= $tA['max_height']){
-				
-				}else{
-					$errorsA[] = 'Incorrect File Height. File must be <= '.$tA['max_height'].' px tall.';
-				}
-			}
-			
-			if(isset($tA['max_width'])){
-				if($image_dimensions[0] <= $tA['max_width']){
-					
-				}else{
-					$errorsA[] = 'Incorrect File Width. File must be <= '.$tA['max_width'].' px wide.';
-				}
-				
-			}
-											
 		}
+		
+		/*
 		
 		if(isset($tA['check_size']) && $tA['check_size'] == 'true'){
 			//
 		}
-		
+		*/
 		if(count($errorsA) > 0){
 			return $errorsA;
 		}else{
