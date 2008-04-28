@@ -897,8 +897,8 @@ class Forms
 		$time = array($t[0],$tD[1],$t[1]);
 	
 			
-		$r  = self::dateComponent($date,$name,$options['name_space']);
-		$r .= self::timeComponent($time,$name,$options['name_space']);
+		$r  = self::dateComponent($date,$name,$options);
+		$r .= self::timeComponent($time,$name,$options);
 		
 		//this is only for validaton from the label for attribute
 		$r .= '<span id="' . $name . '" />';
@@ -926,7 +926,7 @@ class Forms
 		$tD = explode("-",$value);
 		$date = array($tD[1],$tD[2],$tD[0]);
 		
-		$r  = self::dateComponent($date,$name,$options['name_space']);
+		$r  = self::dateComponent($date,$name,$options);
 		self::buildElement($name,$r,$options);
 	}
 	
@@ -939,8 +939,6 @@ class Forms
 	/*
 	
 	Function: dateComponent
-	
-	internal date bits using CMS_MIN and CMS_MAX_YEAR (consider dropping this and feeding in)
 
 	* @param   string   date
 	* @param   string   variable name suffix
@@ -949,9 +947,9 @@ class Forms
 	
 	*/
 	
-	public static function dateComponent($date,$name,$name_space)
+	public static function dateComponent($date,$name,$options)
 	{
-
+		
 		$r = '<select name="'. $name. '_month" class="noparse" >';
 		$monthA = self::getMonths();
 		for($i=1;$i<13;$i++){
@@ -973,12 +971,16 @@ class Forms
 		$r .= '/';
 		$r .= '<select name="' .  $name . '_year" class="noparse" >';
 		
-		($date[2] < CMS_MIN_YEAR) ? $min = $date[2] : $min = CMS_MIN_YEAR;
-		($date[2] > CMS_MAX_YEAR) ? $max = $date[2] : $max = CMS_MAX_YEAR;
+		//set the the default range for years
+		(!isset($options['min_year'])) ? $options['min_year'] = date('Y')-20 : '';
+		(!isset($options['max_year'])) ? $options['max_year'] = date('Y')+21 : '';
+		
+		($date[2] < $options['min_year']) ? $min = $date[2] : $min = $options['min_year'];
+		($date[2] > $options['max_year']) ? $max = $date[2] : $max = $options['max_year'];
 		
 		if($date[2] == ""){
-			$min = CMS_MIN_YEAR;
-			$max = CMS_MAX_YEAR;
+			$min = $options['min_year'];
+			$max = $options['max_year'];
 		}
 		
 		for($i=$min;$i< $max;$i++){

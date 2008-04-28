@@ -423,26 +423,7 @@ class Utils
 	{
 		return date("Y-m-d H:i:s");
 	}
-	
-	/*
-	
-	Function: dateToday
-	
-	Uses the values in the config.inc to set default hour and minute for today
-	
-	Returns:
 		
-		Unix timestamp of today (at CMS default hours and minutes)
-	
-	*/
-	
-	public static function dateToday()
-	{
-		//return date("Y-m-d");
-		$dA = explode("-",self::now());
-		return date("Y-m-d H:i:s", mktime(CMS_DEFAULT_HOUR,CMS_DEFAULT_MIN,0,$dA[1],$dA[2],$dA[0]));
-	}
-	
 	/*
 	
 	Function: dateNow
@@ -484,7 +465,6 @@ class Utils
 		
 		$dA = explode("-",self::now());
 		return date("Y-m-d", mktime(0,0,0,$dA[1],$dA[2],$dA[0]+$y));
-		//return date("Y-m-d", mktime(0,0,0,$dA[1],$dA[2],($dA[0] + 5)));
 	}
 	
 	/*
