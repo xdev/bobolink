@@ -721,33 +721,57 @@ class Forms
 	
 	public static function selectFiles($name,$value,$options)
 	{
-		(isset($options['folder'])) ? $folder = $options['folder'] : $folder = false;
 		
-		//folder
+		$subfolder = (isset($options['subfolder'])) ? $options['subfolder'] : true;
+		$path = (isset($options['path'])) ? $options['path'] : '';
+		$level = (isset($options['level'])) ? $options['level'] : '';
+		$folder = (isset($options['folder'])) ? $options['folder'] : false;
 		
-		$tA = (Utils::listDirectory($folder));
-		$r = "<select name=\"$name\" id=\"$name\">";
-		
-		//find last index of the / and use that index for the substr
-		$p = strrpos($folder,"/") + 2;
-		$r .= '<option value="">(none)</option>';
-		
-		for($i=0;$i<count($tA);$i++){
-			$file = substr($tA[$i],$p);
+		if ($folder) {
 			
-			if($value == $file){
-				$sel = "selected=\"selected\"";
-			}else{
-				$sel = "";
+			$r = $level ? '' : sprintf(
+				'<select name="%s" id="%s"><option value="">(none)</option>',
+				$name,
+				$name
+			);
+			$scan = array_diff(scandir($folder), array('.', '..'));
+			$r2 = '';
+			foreach ($scan as $file) {
+				
+				if (substr($file,0,1) != '.') {
+					
+					if ($subfolder && is_dir($folder.$file)) {
+						$r2 .= sprintf(
+							'<option disabled="disabled">%s</option>',
+							$level.$file.'/'
+						);
+						$options['folder'] = $folder.$file.'/';
+						$options['path'] = $path.$file.'/';
+						$options['level'] = $level.'&nbsp;&nbsp;&nbsp;';
+						$r2 .= self::selectFiles($name,$value,$options);
+					} elseif (is_file($folder.$file)) {
+						$r .= sprintf(
+							'<option value="%s"%s>%s</option>',
+							$path.$file,
+							$value == $path.$file ? ' selected="selected"' : '',
+							$level.$file
+						);
+					}
+					
+				}
+				
 			}
 			
-			$r .= "<option value=\"$file\" $sel >$file</option>";
+			$r .= $r2;
+			$r .= $level ? '' : "</select>";
+			
+			if ($level) {
+				return $r;
+			} else {
+				self::buildElement($name,$r,$options);
+			}
+			
 		}
-	
-		$r .= "</select>";
-	
-		self::buildElement($name,$r,$options);
-		
 	}
 	
 	/*
