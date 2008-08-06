@@ -662,7 +662,6 @@ class Forms
 		
 		function getChildren($name,$value,$options,$parent=0,$depth='',$parent_field_name='parent_id')
 		{
-			//if (isset($options['parent_field_name']) && $options['parent_field_name']) ;
 			$dA = explode("|",$options['col_display']);
 			$r = '';
 			if (strpos($options['select_sql'],'ORDER BY')) {
@@ -677,8 +676,9 @@ class Forms
 			if ($q = $options['db']->query($sql)) {
 				
 				foreach ($q as $row) {
-					(trim($value) == trim($row[$options['col_value']])) ? $selected = "selected=\"selected\"" : $selected = "";
 					$tv = $row[$options['col_value']];
+					$selected = (trim($value) == trim($tv)) ? ' selected="selected"' : '';
+					$disabled = ($tv == $options['id']) ? ' disabled="disabled"' : ''; // Prevent selecting self as parent
 					if (count($dA) > 1) {
 						$td = "";
 						for ($j=0;$j<count($dA);$j++) {
@@ -692,9 +692,10 @@ class Forms
 					}
 				
 					$r .= sprintf(
-						'<option value="%s" %s>%s</option>',
+						'<option value="%s"%s%s>%s</option>',
 						$tv,
 						$selected,
+						$disabled,
 						$depth.$td
 					);
 					$r .= getChildren($name,$value,$options,$row[$options['col_value']],$depth.'— ',$parent_field_name);
