@@ -2,8 +2,6 @@
 
 /*
 
-$Id: $
-
 Class: EmailProtector
 
 Protects and safeguards email addresse

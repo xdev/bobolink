@@ -2,8 +2,6 @@
 
 /*
 
-$Id$
-
 Class: AdaptorMysql
 
 Collection of mysql wrapper functions

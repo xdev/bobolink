@@ -2,11 +2,9 @@
 
 /*
 
-$Id: AdaptorMysql.class.php 26 2008-01-09 01:36:31Z joshuarudd $
+Class: AdaptorPostgresql
 
-Class: AdaptorMysql
-
-Collection of mysql wrapper functions
+Collection of Postgresql wrapper functions
 
 */
 

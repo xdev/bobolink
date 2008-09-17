@@ -2,8 +2,6 @@
 
 /*
 
-$Id$
-
 Class: Utils
 
 Collection of general utility functions, static

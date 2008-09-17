@@ -1,11 +1,5 @@
 <?php
 
-/*
-
-$Id$
-
-*/
-
 header('Content-Type: text/xml');
 
 Class FlashMW

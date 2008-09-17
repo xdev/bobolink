@@ -2,8 +2,6 @@
 
 /*
 
-$Id$
-
 Class: Forms
 
 Collection of functions dealing with creating form elements
