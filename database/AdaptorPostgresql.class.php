@@ -11,7 +11,8 @@ Collection of Postgresql wrapper functions
 class AdaptorPostgresql implements Db
 {
 	
-	private $connection;
+	private static $connection;
+	private static $instance = null;
 	
 	/*
 	
@@ -21,9 +22,9 @@ class AdaptorPostgresql implements Db
 	
 	*/
 	
-	public function __construct()
+	private function __construct()
 	{
-		$this->openConnection();
+		self::openConnection();
 	}
 	
 	/*
@@ -36,7 +37,24 @@ class AdaptorPostgresql implements Db
 	
 	public function __destruct()
 	{
-		$this->closeConnection();
+		self::closeConnection();
+	}
+	
+	/*
+	
+	Function: getInstance
+	
+	Singleton creation
+	
+	*/
+	
+	public static function getInstance()
+	{
+		if(!self::$instance){
+			$c = __CLASS__;
+			self::$instance = new $c();
+		}
+		return self::$instance;
 	}
 	
 	/*
@@ -47,11 +65,11 @@ class AdaptorPostgresql implements Db
 	
 	*/
 	
-	public function openConnection()
+	public static function openConnection()
 	{
 		$DB = $GLOBALS['DATABASE'];
 			
-		$this->connection = pg_connect('host='.$DB['host'].' dbname='.$DB['db'].' user='.$DB['user'].' password='.$DB['pass'])
+		self::$connection = pg_connect('host='.$DB['host'].' dbname='.$DB['db'].' user='.$DB['user'].' password='.$DB['pass'])
 		    or die('Could not connect: ' . pg_last_error());
 		
 	}
@@ -64,9 +82,9 @@ class AdaptorPostgresql implements Db
 	
 	*/
 	
-	public function closeConnection()
+	public static function closeConnection()
 	{
-		pg_close($this->connection);
+		pg_close(self::$connection);
 	}
 	
 	/*
@@ -85,9 +103,9 @@ class AdaptorPostgresql implements Db
 	
 	*/
 	
-	public function sql($sql)
+	public static function sql($sql)
 	{
-		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,self::$connection) or die(mysql_error() . $sql);
 		return $r;
 	}
 	
@@ -107,9 +125,9 @@ class AdaptorPostgresql implements Db
 		
 	*/
 	
-	public function queryRow($sql)
+	public static function queryRow($sql)
 	{
-		$r = pg_query($this->connection,$sql) or die('Query failed: ' . pg_last_error());
+		$r = pg_query(self::$connection,$sql) or die('Query failed: ' . pg_last_error());
 		if(pg_num_rows($r) == 0){
 			return false;
 		}else{
@@ -137,9 +155,9 @@ class AdaptorPostgresql implements Db
 		
 	*/
 	
-	public function query($sql){
+	public static function query($sql){
 		
-		$r = pg_query($this->connection,$sql) or die('Query failed: ' . pg_last_error());
+		$r = pg_query(self::$connection,$sql) or die('Query failed: ' . pg_last_error());
 		if(pg_num_rows($r) == 0){
 			return false;
 		}else{
@@ -181,7 +199,7 @@ class AdaptorPostgresql implements Db
 	
 	*/
 	
-	public function insert($table,$row_data)
+	public static function insert($table,$row_data)
 	{
 		
 		//need to make exception for mysql functions
@@ -194,7 +212,7 @@ class AdaptorPostgresql implements Db
 			
 		for($i=0;$i<count($row_data);$i++){
 			$i_cols .= "".$row_data[$i]['field']."";
-			$i_vals .= "'".  pg_escape_string($this->connection,stripslashes($row_data[$i]['value'])) . "'";
+			$i_vals .= "'".  pg_escape_string(self::$connection,stripslashes($row_data[$i]['value'])) . "'";
 			if($i != count($row_data) - 1){
 				$i_cols .= ",";
 				$i_vals .= ",";
@@ -203,7 +221,7 @@ class AdaptorPostgresql implements Db
 		
 		$sql .= "($i_cols) VALUES ($i_vals)";
 		
-		pg_query($this->connection,$sql) or die(pg_last_error() . "<p class=\"error\">$sql</p>");
+		pg_query(self::$connection,$sql) or die(pg_last_error() . "<p class=\"error\">$sql</p>");
 		
 		return $sql;
 	
@@ -229,7 +247,7 @@ class AdaptorPostgresql implements Db
 	
 	*/
 	
-	public function update($table,$row_data,$k,$v)
+	public static function update($table,$row_data,$k,$v)
 	{
 		
 		$sql = "UPDATE `$table` SET ";
@@ -237,14 +255,14 @@ class AdaptorPostgresql implements Db
 			
 		for($i=0;$i<count($row_data);$i++){
 			
-			$update .= "`".$row_data[$i]['field']."` = '" . pg_escape_string($this->connection,stripslashes($row_data[$i]['value'])) . "'";
+			$update .= "`".$row_data[$i]['field']."` = '" . pg_escape_string(self::$connection,stripslashes($row_data[$i]['value'])) . "'";
 			if($i != count($row_data) - 1){
 				$update .= ",";				
 			}			
 		}
 		
 		$sql .= "$update WHERE `$k` = '$v'";
-		pg_query($this->connection,$sql) or die(pg_last_error() . "<p class=\"error\">$sql</p>");
+		pg_query(self::$connection,$sql) or die(pg_last_error() . "<p class=\"error\">$sql</p>");
 		
 		return $sql;
 	
@@ -266,9 +284,9 @@ class AdaptorPostgresql implements Db
 	
 	*/
 		
-	public function getInsertId($table){
+	public static function getInsertId($table){
 		
-		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'",$this->connection);
+		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'",self::$connection);
 		$row = mysql_fetch_assoc($q);
 		return intval($row['Auto_increment']);
 	
@@ -291,7 +309,7 @@ class AdaptorPostgresql implements Db
 
 	*/
 	
-	public function generateSearch($fields,$search)
+	public static function generateSearch($fields,$search)
 	{
 		$searchQ = "";
 		

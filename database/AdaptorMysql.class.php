@@ -8,10 +8,13 @@ Collection of mysql wrapper functions
 
 */
 
+// 
+
 class AdaptorMysql implements Db
 {
 	
-	private $connection;
+	private static $connection;
+	private static $instance = null;
 	
 	/*
 	
@@ -21,9 +24,9 @@ class AdaptorMysql implements Db
 	
 	*/
 	
-	public function __construct()
+	private function __construct()
 	{
-		$this->openConnection();
+		self::openConnection();
 	}
 	
 	/*
@@ -36,7 +39,24 @@ class AdaptorMysql implements Db
 	
 	public function __destruct()
 	{
-		$this->closeConnection();
+		self::closeConnection();
+	}
+	
+	/*
+	
+	Function: getInstance
+	
+	Singleton creation
+	
+	*/
+	
+	public static function getInstance()
+	{
+		if(!self::$instance){
+			$c = __CLASS__;
+			self::$instance = new $c();
+		}
+		return self::$instance;
 	}
 	
 	/*
@@ -47,16 +67,17 @@ class AdaptorMysql implements Db
 	
 	*/
 	
-	public function openConnection()
+	public static function openConnection()
 	{
 		$DB = $GLOBALS['DATABASE'];
-				
-		$this->connection = mysql_connect($DB['host'], $DB['user'], $DB['pass']);
 		
-		if (!$this->connection){
+				
+		self::$connection = mysql_connect($DB['host'], $DB['user'], $DB['pass']);
+		
+		if (!self::$connection){
 			die('Could not connect to the database: ' . mysql_error());
 		}
-		mysql_select_db($DB['db'],$this->connection);
+		mysql_select_db($DB['db'],self::$connection);
 	}
 	
 	/*
@@ -67,9 +88,9 @@ class AdaptorMysql implements Db
 	
 	*/
 	
-	public function closeConnection()
+	public static function closeConnection()
 	{
-		mysql_close($this->connection);
+		mysql_close(self::$connection);
 	}
 	
 	/*
@@ -88,9 +109,9 @@ class AdaptorMysql implements Db
 	
 	*/
 	
-	public function sql($sql)
+	public static function sql($sql)
 	{
-		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,self::$connection) or die(mysql_error() . $sql);
 		return $r;
 	}
 	
@@ -110,9 +131,9 @@ class AdaptorMysql implements Db
 		
 	*/
 	
-	public function queryRow($sql)
+	public static function queryRow($sql)
 	{
-		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,self::$connection) or die(mysql_error() . $sql);
 		$tA = mysql_fetch_array($r,MYSQL_BOTH);
 				
 		if(mysql_num_rows($r) == 0){
@@ -140,9 +161,9 @@ class AdaptorMysql implements Db
 		
 	*/
 	
-	public function query($sql){
+	public static function query($sql){
 	
-		$r = mysql_query($sql,$this->connection) or die(mysql_error() . $sql);
+		$r = mysql_query($sql,self::$connection) or die(mysql_error() . $sql);
 		if(mysql_num_rows($r) == 0){
 			return false;		
 		}else{		
@@ -188,7 +209,7 @@ class AdaptorMysql implements Db
 	
 	*/
 	
-	public function insert($table,$row_data)
+	public static function insert($table,$row_data)
 	{
 		
 		//need to make exception for mysql functions
@@ -210,7 +231,7 @@ class AdaptorMysql implements Db
 		
 		$sql .= "($i_cols) VALUES ($i_vals)";
 		
-		mysql_query($sql,$this->connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
+		mysql_query($sql,self::$connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
 		
 		return $sql;
 	
@@ -236,7 +257,7 @@ class AdaptorMysql implements Db
 	
 	*/
 	
-	public function update($table,$row_data,$k,$v)
+	public static function update($table,$row_data,$k,$v)
 	{
 		
 		$sql = "UPDATE `$table` SET ";
@@ -251,7 +272,7 @@ class AdaptorMysql implements Db
 		}
 		
 		$sql .= "$update WHERE `$k` = '$v'";
-		mysql_query($sql,$this->connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
+		mysql_query($sql,self::$connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
 		
 		return $sql;
 	
@@ -273,9 +294,9 @@ class AdaptorMysql implements Db
 	
 	*/
 		
-	public function getInsertId($table){
+	public static function getInsertId($table){
 		
-		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'",$this->connection);
+		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'",self::$connection);
 		$row = mysql_fetch_assoc($q);
 		return intval($row['Auto_increment']);
 	
@@ -298,7 +319,7 @@ class AdaptorMysql implements Db
 
 	*/
 	
-	public function generateSearch($fields,$search)
+	public static function generateSearch($fields,$search)
 	{
 		$searchQ = "";
 		
@@ -312,5 +333,3 @@ class AdaptorMysql implements Db
 	}
 
 }
-
-?>

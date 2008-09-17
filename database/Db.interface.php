@@ -10,27 +10,23 @@ For use with a variety of database adaptors
 
 interface Db
 {
-
-	public function __construct();
 	
-	public function __destruct();
+	public static function getInstance();
 	
-	public function openConnection();
+	public static function openConnection();
 	
-	public function closeConnection();
+	public static function closeConnection();
 	
-	public function sql($sql);
+	public static function sql($sql);
 	
-	public function queryRow($sql);
+	public static function queryRow($sql);
 	
-	public function query($sql);
+	public static function query($sql);
 	
-	public function insert($table,$row_data);
+	public static function insert($table,$row_data);
 	
-	public function update($table,$row_data,$k,$v);
+	public static function update($table,$row_data,$k,$v);
 	
-	public function getInsertId($table);
+	public static function getInsertId($table);
 	
 }
-
-?>
