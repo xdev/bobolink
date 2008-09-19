@@ -27,6 +27,8 @@ class AdaptorMysql implements Db
 	private function __construct()
 	{
 		self::openConnection();
+		// Set names (database charset) if DB_CHARSET is defined
+		if (defined('DB_CHARSET')) self::sql("SET NAMES '".DB_CHARSET."'");
 	}
 	
 	/*
