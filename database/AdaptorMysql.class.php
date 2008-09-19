@@ -27,8 +27,6 @@ class AdaptorMysql implements Db
 	private function __construct()
 	{
 		self::openConnection();
-		// Set names (database charset) if DB_CHARSET is defined
-		if (defined('DB_CHARSET')) self::sql("SET NAMES '".DB_CHARSET."'");
 	}
 	
 	/*
@@ -73,13 +71,15 @@ class AdaptorMysql implements Db
 	{
 		$DB = $GLOBALS['DATABASE'];
 		
-				
 		self::$connection = mysql_connect($DB['host'], $DB['user'], $DB['pass']);
 		
 		if (!self::$connection){
 			die('Could not connect to the database: ' . mysql_error());
 		}
 		mysql_select_db($DB['db'],self::$connection);
+		
+		// Set names (database charset) if charset is defined
+		if (isset($DB['charset'])) self::sql("SET NAMES '".$DB['charset']."'");
 	}
 	
 	/*
