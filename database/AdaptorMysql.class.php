@@ -296,12 +296,28 @@ class AdaptorMysql implements Db
 	
 	*/
 		
-	public static function getInsertId($table){
+	public static function getInsertId($table)
+	{
 		
 		$q = mysql_query("SHOW TABLE STATUS FROM `" . $GLOBALS['DATABASE']['db'] . "` LIKE '" . $table . "'",self::$connection);
 		$row = mysql_fetch_assoc($q);
 		return intval($row['Auto_increment']);
 	
+	}
+	
+	public static function getPrimaryKey($table)
+	{
+		$q = self::query("SHOW COLUMNS FROM $table",MYSQL_BOTH);
+		//by default set to the first one
+		$key = $q[0]['Field'];
+		//find real primary key
+		foreach($q as $column){
+			if($column['Key'] == 'PRI'){
+				$key = $column['Field'];
+				break;
+			}
+		}		
+		return $key;
 	}
 	
 	/*
