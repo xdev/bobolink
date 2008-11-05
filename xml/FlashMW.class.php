@@ -18,7 +18,7 @@ Class FlashMW
 	{
 		
 		if(!isset($database)){
-			$this->db = new AdaptorMysql();
+			$this->db = AdaptorMysql::getInstance();
 		}else{
 			$this->db = $database;
 		}
