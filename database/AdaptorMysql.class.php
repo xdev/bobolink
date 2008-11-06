@@ -80,6 +80,9 @@ class AdaptorMysql implements Db
 		
 		// Set names (database charset) if charset is defined
 		if (isset($DB['charset'])) self::sql("SET NAMES '".$DB['charset']."'");
+		
+		// Set database timezone if it is defined
+		if (isset($DB['timezone'])) self::sql("SET time_zone = '".$DB['timezone']."'");
 	}
 	
 	/*
