@@ -395,8 +395,8 @@ class Forms
 	public static function readonly($name,$value = "",$options)
 	{
 		$t = $name . "_static";
-		
-		self::buildElement($t,"<span id=\"$t\">$value</span><input type=\"hidden\" id=\"$name\" name=\"$name\" value=\"$value\" />",$options);
+		$display_value = isset($options['display_value']) ? $options['display_value'] : $value;
+		self::buildElement($t,"<span id=\"$t\">$display_value</span><input type=\"hidden\" id=\"$name\" name=\"$name\" value=\"$value\" />",$options);
 		
 		/*
 		print("
