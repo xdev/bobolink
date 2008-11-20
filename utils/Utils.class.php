@@ -560,8 +560,12 @@ class Utils
 	
 	public static function humanFileSize($size)
 	{
-		$filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
-		return round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i];
+		if($size > 0){
+			$filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
+			return round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i];
+		}else{
+			return '';
+		}
 	}
 	
 	/*
