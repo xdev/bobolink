@@ -790,7 +790,7 @@ class Utils
 	{
 		//need to build in the checkDirectory on the destination
 		
-		$options['crop']    = isset($options['crop'])    ? $options['crop']    : false;
+		$options['crop']    = isset($options['crop'])    ? true                : false;
 		$options['quality'] = isset($options['quality']) ? $options['quality'] : 100;
 		
 		// Make sure we have values for both height & width
