@@ -790,6 +790,12 @@ class Utils
 	{
 		//need to build in the checkDirectory on the destination
 		
+		$options['quality'] = isset($options['quality']) ? $options['quality'] : 100;
+		
+		// Make sure we have values for both height & width
+		$new_w = $new_w ? $new_w : $new_h;
+		$new_h = $new_h ? $new_h : $new_w;
+		
 		if($options['mode'] == 'jpg'){
 			$src_img=ImageCreateFromJpeg($src_name);
 		}
@@ -800,20 +806,32 @@ class Utils
 			$src_img=ImageCreateFromGif($src_name);
 		}
 		
-		$old_x=imageSX($src_img);
-		$old_y=imageSY($src_img);
+		list($old_w, $old_h) = getimagesize($src_name);
 		
-		if ($old_x > $old_y) {
-			$thumb_w=$new_w;
-			$thumb_h=ceil($old_y*($new_h/$old_x));
-		}
-		if ($old_x < $old_y) {
-			$thumb_w=ceil($old_x*($new_w/$old_y));
-			$thumb_h=$new_h;
-		}
-		if ($old_x == $old_y) {
+		$old_ratio = ($old_h/$old_w);
+		$new_ratio = ($new_h/$new_w);
+		
+		if ($old_w == $old_h) {
 			$thumb_w=$new_w;
 			$thumb_h=$new_h;
+		}
+		elseif ($old_w > $old_h) {
+			if ($old_ratio <= $new_ratio) {
+				$thumb_w=$new_w;
+				$thumb_h=ceil($new_w*($old_h/$old_w));
+			} else {
+				$thumb_h=$new_h;
+				$thumb_w=ceil($new_h*($old_w/$old_h));
+			}
+		}
+		elseif ($old_w < $old_h) {
+			if ($old_ratio >= $new_ratio) {
+				$thumb_h=$new_h;
+				$thumb_w=ceil($new_h*($old_w/$old_h));
+			} else {
+				$thumb_w=$new_w;
+				$thumb_h=ceil($new_w*($old_h/$old_w));
+			}
 		}
 		
 		$dst_img=ImageCreateTrueColor($thumb_w,$thumb_h);
@@ -822,7 +840,7 @@ class Utils
 			imagealphablending($dst_img, false);
 		}
 		
-		imagecopyresampled($dst_img,$src_img,0,0,0,0,$thumb_w,$thumb_h,$old_x,$old_y); 
+		imagecopyresampled($dst_img,$src_img,0,0,0,0,$thumb_w,$thumb_h,$old_w,$old_h); 
 		
 		if(!(isset($options['output_mode']))){
 			$options['output_mode'] = $options['mode'];
@@ -840,7 +858,7 @@ class Utils
 		}
 				
 		if($options['mode'] == 'gif'){
-			imagegif($dst_img,$dst_name,$options['quality']); 
+			imagegif($dst_img,$dst_name); 
 		}		
 		
 		imagedestroy($dst_img); 
