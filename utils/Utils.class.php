@@ -560,8 +560,12 @@ class Utils
 	
 	public static function humanFileSize($size)
 	{
-		$filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
-		return round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i];
+		if($size > 0){
+			$filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
+			return round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i];
+		}else{
+			return '';
+		}
 	}
 	
 	/*
@@ -786,6 +790,25 @@ class Utils
 	{
 		//need to build in the checkDirectory on the destination
 		
+		$options['crop']    = isset($options['crop'])    ? $options['crop']    : false;
+		$options['quality'] = isset($options['quality']) ? $options['quality'] : 100;
+		
+		// Make sure we have values for both height & width
+		$new_w = $new_w ? $new_w : $new_h;
+		$new_h = $new_h ? $new_h : $new_w;
+		
+		// Get original image size
+		list($old_w, $old_h) = getimagesize($src_name);
+		
+		$dst_x = 0;
+		$dst_y = 0;
+		$src_x = 0;
+		$src_y = 0;
+		
+		// Get old/new aspect ratios
+		$old_ratio = ($old_h/$old_w);
+		$new_ratio = ($new_h/$new_w);
+		
 		if($options['mode'] == 'jpg'){
 			$src_img=ImageCreateFromJpeg($src_name);
 		}
@@ -796,29 +819,78 @@ class Utils
 			$src_img=ImageCreateFromGif($src_name);
 		}
 		
-		$old_x=imageSX($src_img);
-		$old_y=imageSY($src_img);
-		
-		if ($old_x > $old_y) {
-			$thumb_w=$new_w;
-			$thumb_h=ceil($old_y*($new_h/$old_x));
-		}
-		if ($old_x < $old_y) {
-			$thumb_w=ceil($old_x*($new_w/$old_y));
-			$thumb_h=$new_h;
-		}
-		if ($old_x == $old_y) {
+		// Crop image
+		if ($options['crop']) {
+			
 			$thumb_w=$new_w;
 			$thumb_h=$new_h;
+			
+			$dst_img=ImageCreateTrueColor($thumb_w,$thumb_h);
+			
+			$ratio_w = $old_w/$new_w;
+			$ratio_h = $old_h/$new_h;
+			
+			$h_height = $new_h/2;
+			$w_height = $new_w/2;
+			
+			if ($old_w > $old_h) {
+				if ($old_ratio >= $new_ratio) {
+					$thumb_h = $old_h / $ratio_w;
+					$dst_y = -(($thumb_h / 2) - $h_height);
+				} else {
+					$thumb_w = $old_w / $ratio_h;
+					$dst_x = -(($thumb_w / 2) - $w_height);
+				}
+			}
+			elseif ($old_w < $old_h || $old_w == $old_h) {
+				if ($old_ratio >= $new_ratio) {
+					$thumb_h = $old_h / $ratio_w;
+					$dst_y = -(($thumb_h / 2) - $h_height);
+				} else {
+					$thumb_w = $old_w / $ratio_h;
+					$dst_x = -(($thumb_w / 2) - $w_height);
+				}
+			}
+			
 		}
 		
-		$dst_img=ImageCreateTrueColor($thumb_w,$thumb_h);
+		
+		// Resize image
+		else {
+			
+			if ($old_w == $old_h) {
+				$thumb_w=$new_w;
+				$thumb_h=$new_h;
+			}
+			elseif ($old_w > $old_h) {
+				if ($old_ratio <= $new_ratio) {
+					$thumb_w=$new_w;
+					$thumb_h=ceil($new_w*($old_h/$old_w));
+				} else {
+					$thumb_h=$new_h;
+					$thumb_w=ceil($new_h*($old_w/$old_h));
+				}
+			}
+			elseif ($old_w < $old_h) {
+				if ($old_ratio >= $new_ratio) {
+					$thumb_h=$new_h;
+					$thumb_w=ceil($new_h*($old_w/$old_h));
+				} else {
+					$thumb_w=$new_w;
+					$thumb_h=ceil($new_w*($old_h/$old_w));
+				}
+			}
+			
+			$dst_img=ImageCreateTrueColor($thumb_w,$thumb_h);
+			
+		}
+		
 		
 		if($options['mode'] == 'png'){
 			imagealphablending($dst_img, false);
 		}
 		
-		imagecopyresampled($dst_img,$src_img,0,0,0,0,$thumb_w,$thumb_h,$old_x,$old_y); 
+		imagecopyresampled($dst_img,$src_img,$dst_x,$dst_y,$src_x,$src_y,$thumb_w,$thumb_h,$old_w,$old_h); 
 		
 		if(!(isset($options['output_mode']))){
 			$options['output_mode'] = $options['mode'];
@@ -834,9 +906,9 @@ class Utils
 		if($options['mode'] == 'jpg'){
 			imagejpeg($dst_img,$dst_name,$options['quality']); 
 		}
-				
+		
 		if($options['mode'] == 'gif'){
-			imagegif($dst_img,$dst_name,$options['quality']); 
+			imagegif($dst_img,$dst_name); 
 		}		
 		
 		imagedestroy($dst_img); 

@@ -69,20 +69,26 @@ class AdaptorMysql implements Db
 	
 	public static function openConnection()
 	{
-		$DB = $GLOBALS['DATABASE'];
+		$host     = isset($GLOBALS['DATABASE']['host'])     ? $GLOBALS['DATABASE']['host']     : 'localhost';
+		$db       = isset($GLOBALS['DATABASE']['db'])       ? $GLOBALS['DATABASE']['db']       : null;
+		$user     = isset($GLOBALS['DATABASE']['user'])     ? $GLOBALS['DATABASE']['user']     : 'root';
+		$pass     = isset($GLOBALS['DATABASE']['pass'])     ? $GLOBALS['DATABASE']['pass']     : 'root';
+		$charset  = isset($GLOBALS['DATABASE']['charset'])  ? $GLOBALS['DATABASE']['charset']  : 'utf8';
+		$timezone = isset($GLOBALS['DATABASE']['timezone']) ? $GLOBALS['DATABASE']['timezone'] : substr(strftime('%z', time()),0,3) . ':' . substr(strftime('%z', time()),3);
 		
-		self::$connection = mysql_connect($DB['host'], $DB['user'], $DB['pass']);
-		
-		if (!self::$connection){
+		// Connect to database
+		if (!self::$connection = mysql_connect($host, $user, $pass)) {
 			die('Could not connect to the database: ' . mysql_error());
 		}
-		mysql_select_db($DB['db'],self::$connection);
+		
+		// Select database
+		if ($db) mysql_select_db($db,self::$connection);
 		
 		// Set names (database charset) if charset is defined
-		if (isset($DB['charset'])) self::sql("SET NAMES '".$DB['charset']."'");
+		if ($charset) self::sql("SET NAMES '$charset'");
 		
-		// Set database timezone if it is defined
-		if (isset($DB['timezone'])) self::sql("SET time_zone = '".$DB['timezone']."'");
+		// Set timezone
+		self::sql("SET time_zone = '$timezone'");
 	}
 	
 	/*
