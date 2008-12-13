@@ -826,8 +826,9 @@ class Forms
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
 		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
+		(isset($options['datasource'])) ? $datasource = $options['datasource'] : $datasource = 'cms_states';
 		
-		$q = $options['db']->query("SELECT * FROM cms_states WHERE country_id = '$country' ORDER BY name");
+		$q = $options['db']->query("SELECT * FROM $datasource WHERE country_id = '$country' ORDER BY name");
 		
 		$r = "<select name=\"$name\" id=\"$name\" class=\"$class\" $onchange>";
 		$r .= "<option value=\"0\">----------</option>";
@@ -862,8 +863,9 @@ class Forms
 		(isset($options['mode'])) ? $mode = $options['mode'] : $mode = "";
 		(isset($options['onchange'])) ? $onchange = "onchange=\"$options[onchange]\"" : $onchange = "";
 		(isset($options['class'])) ? $class = $options['class'] : $class = "";
+		(isset($options['datasource'])) ? $datasource = $options['datasource'] : $datasource = 'cms_countries';
 		
-		$q = $options['db']->query("SELECT * FROM `cms_countries` WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
+		$q = $options['db']->query("SELECT * FROM $datasource WHERE c_id = 'US' OR c_id = 'GB' OR c_id = 'CA' OR c_id = 'MX' ORDER BY name DESC");
 		$tl = count($q);
 		$r = '<select name="'.$name.'" id="'.$name.'" class="'. $class . '" '. $onchange . '>';
 			
@@ -876,7 +878,7 @@ class Forms
 		
 		$r .= "<option value=\"0\" disabled=\"disabled\">----------------------------------</option>";
 		
-		$q = $options['db']->query("SELECT * FROM `cms_countries` WHERE active = 1");
+		$q = $options['db']->query("SELECT * FROM $datasource WHERE active = 1");
 		$tl = count($q);
 			
 		for($i=0;$i<$tl;$i++){
