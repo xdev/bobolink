@@ -809,7 +809,7 @@ class Utils
 		$old_ratio = ($old_h/$old_w);
 		$new_ratio = ($new_h/$new_w);
 		
-		if($options['mode'] == 'jpg'){
+		if($options['mode'] == 'jpg' || $options['mode'] == 'jpeg'){
 			$src_img=ImageCreateFromJpeg($src_name);
 		}
 		if($options['mode'] == 'png'){
@@ -903,7 +903,7 @@ class Utils
 			imagepng($dst_img,$dst_name); 
 		}
 		
-		if($options['mode'] == 'jpg'){
+		if($options['mode'] == 'jpg' || $options['mode'] == 'jpeg'){
 			imagejpeg($dst_img,$dst_name,$options['quality']); 
 		}
 		
