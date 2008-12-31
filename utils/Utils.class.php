@@ -1211,6 +1211,35 @@ class Utils
 	
 	/*
 	
+	Function: timezone
+	
+	Returns the timezone from input (GMT offset or TZ abbreviation) or cookie
+	
+	Parameters:
+	
+		input:Integer/String
+	
+	*/
+	
+	public static function timezone($input = 0, $isdst = 0)
+	{
+		if (strpos($input,'/')) {
+			$tz = $input;
+		}
+		elseif ($input === 0 && isset($_COOKIE['gmtOffset'])) {
+			$tz = timezone_name_from_abbr(null,$_COOKIE['gmtOffset'] * 3600, $isdst);
+		}
+		elseif (is_numeric($input)) {
+			$tz = timezone_name_from_abbr(null,$input * 3600, $isdst);
+		}
+		else {
+			$tz = timezone_name_from_abbr($input);
+		}
+		return $tz ? $tz : 'UTC';
+	}
+	
+	/*
+	
 	Function: localize
 	
 	Sets a cookie with the user's preferred language.
@@ -1251,19 +1280,21 @@ class Utils
 	
 	Function: relativeDate
 	
-	Returns relative date, based on get_date() by GreyCobra.com
+	Returns relative date. Based on get_date() by GreyCobra.com
 	http://www.webdesign.org/web/web-programming/php/relative-dates.8192.html
 	
 	Parameters:
 	
-		date:String
+		datetime:String
+		format:String - formatted for strftime()
 	
 	*/
 	
-	public static function relativeDate($datetime = null, $type = null)
+	public static function relativeDate($datetime = null, $format = '%e %B %Y')
 	{
-		self::localize();
-		if (!$timestamp = strtotime($datetime)) $timestamp = $datetime;
+		if ($datetime) {
+		
+			if (!$timestamp = strtotime($datetime)) $timestamp = $datetime;
 			
 			// calculate the diffrence 
 			$timediff = time() - $timestamp;
@@ -1299,15 +1330,12 @@ class Utils
 			}*/
 			
 			else { 
-				$r = setlocale(LC_TIME,0) . ' ' . @strftime('%e %B %Y %z', $timestamp);
-				if ($type=="fulldate") {   
-					$r = @date('j M Y, H:i', $timestamp);
-				} elseif ($type=="time") {
-					$r = @date('H:i', $timestamp);
-				} 
+				$r = @strftime($format, $timestamp);
 			}
 			
 			return $r;
+			
+		}
 		
 	}
 	
