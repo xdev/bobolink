@@ -1211,6 +1211,108 @@ class Utils
 	
 	/*
 	
+	Function: localize
+	
+	Sets a cookie with the user's preferred language.
+	Sets the system's locale based on the user's preferred language
+	
+	Parameters:
+	
+		lang:Array
+	
+	*/
+	
+	public static function localize($lang = null)
+	{
+		// Get lang (either by user-defined, cookie, or user agent)
+		$lang = $lang ? $lang : (isset($_COOKIE['lang']) ? explode(',',$_COOKIE['lang']) : explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']));
+		
+		// Cleanup lang and locale
+		if (is_array($lang)) {
+			foreach ($lang as $key=>$value) {
+				// Cleanup lang array
+				if ($pos = strpos($value,';')) $lang[$key] = substr($value,0,$pos);
+				// Cleanup locale array
+				$locale[$key] = strpos($lang[$key],'-') ? str_replace('-','_',$lang[$key]) : $lang[$key] . '_' . $lang[$key];
+			}
+		} else {
+			// Cleanup lang array
+			if ($pos = strpos($lang,';')) $lang = substr($lang,0,$pos);
+			// Cleanup locale array
+			$locale = strpos($lang,'-') ? str_replace('-','_',$lang) : $lang . '_' . $lang;
+		}
+		
+		// Set lang cookie and locale
+		setcookie('lang', implode(',',$lang), time()+60*60*24*30);
+		setlocale(LC_TIME,$locale);
+	}
+	
+	/*
+	
+	Function: relativeDate
+	
+	Returns relative date, based on get_date() by GreyCobra.com
+	http://www.webdesign.org/web/web-programming/php/relative-dates.8192.html
+	
+	Parameters:
+	
+		date:String
+	
+	*/
+	
+	public static function relativeDate($datetime = null, $type = null)
+	{
+		self::localize();
+		if (!$timestamp = strtotime($datetime)) $timestamp = $datetime;
+			
+			// calculate the diffrence 
+			$timediff = time() - $timestamp;
+			
+			/* n minute(s) ago */
+			if ($timediff < 3600) {
+				if ($timediff < 120) {
+					$r = "1 minute ago";
+				} else {
+					$r =  intval($timediff / 60) . " minutes ago"; 
+				}
+			}
+			
+			/* n hour(s) ago */
+			elseif ($timediff < 7200) {
+				$r = "1 hour ago";
+			} else if ($timediff < 86400) {
+				$r = intval($timediff / 3600) . " hours ago";
+			}
+			
+			/* n day(s) ago */
+			else if ($timediff < 172800) {
+				$r = "1 day ago";
+			} else if ($timediff < 604800) {
+				$r = intval($timediff / 86400) . " days ago";
+			}
+			
+			/* n week(s) ago */
+			elseif ($timediff < 1209600) {
+				$r = "1 week ago";
+			}/* else if ($timediff < 3024000) {
+				$r = intval($timediff / 604900) . " weeks ago";
+			}*/
+			
+			else { 
+				$r = setlocale(LC_TIME,0) . ' ' . @strftime('%e %B %Y %z', $timestamp);
+				if ($type=="fulldate") {   
+					$r = @date('j M Y, H:i', $timestamp);
+				} elseif ($type=="time") {
+					$r = @date('H:i', $timestamp);
+				} 
+			}
+			
+			return $r;
+		
+	}
+	
+	/*
+	
 	Function: titleCase
 	
 	Attempts to convert a string to title case
