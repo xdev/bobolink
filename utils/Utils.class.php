@@ -1211,7 +1211,7 @@ class Utils
 	
 	/*
 	
-	Function: timezone
+	Function: getTimezone
 	
 	Returns the timezone from input (GMT offset or TZ abbreviation) or cookie
 	
@@ -1221,7 +1221,7 @@ class Utils
 	
 	*/
 	
-	public static function timezone($input = 0, $isdst = 0)
+	public static function getTimezone($input = 0, $isdst = 0)
 	{
 		if (strpos($input,'/')) {
 			$tz = $input;
@@ -1236,6 +1236,31 @@ class Utils
 			$tz = timezone_name_from_abbr($input);
 		}
 		return $tz ? $tz : 'UTC';
+	}
+	
+	/*
+	
+	Function: setTimezone
+	
+	Sets the timezone
+	
+	Parameters:
+	
+		timezone:String
+	
+	*/
+	
+	public static function setTimezone($timezone = null)
+	{
+		date_default_timezone_set($timezone = $timezone ? $timezone : self::getTimezone());
+		//die(timezone_offset_get());
+		
+		$offset = substr(strftime('%z', time()),0,3) . ':' . substr(strftime('%z', time()),3);
+		//die(date_default_timezone_get() .' : ' . $offset);
+		// Set timezone for database connection (if a connection exists)
+		if (class_exists('AdaptorMysql')) {
+			AdaptorMysql::sql("SET time_zone = '$offset'");
+		}
 	}
 	
 	/*
