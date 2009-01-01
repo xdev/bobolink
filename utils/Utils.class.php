@@ -1348,9 +1348,9 @@ class Utils
 			}
 			
 			/* n week(s) ago */
-			elseif ($timediff < 1209600) {
+			/*elseif ($timediff < 1209600) {
 				$r = "1 week ago";
-			}/* else if ($timediff < 3024000) {
+			} else if ($timediff < 3024000) {
 				$r = intval($timediff / 604900) . " weeks ago";
 			}*/
 			
