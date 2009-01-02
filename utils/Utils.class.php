@@ -1282,18 +1282,12 @@ class Utils
 		$lang = $lang ? $lang : (isset($_COOKIE['lang']) ? explode(',',$_COOKIE['lang']) : explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']));
 		
 		// Cleanup lang and locale
-		if (is_array($lang)) {
-			foreach ($lang as $key=>$value) {
-				// Cleanup lang array
-				if ($pos = strpos($value,';')) $lang[$key] = substr($value,0,$pos);
-				// Cleanup locale array
-				$locale[$key] = strpos($lang[$key],'-') ? str_replace('-','_',$lang[$key]) : $lang[$key] . '_' . $lang[$key];
-			}
-		} else {
+		if (!is_array($lang)) $lang = explode(',',$lang);
+		foreach ($lang as $key=>$value) {
 			// Cleanup lang array
-			if ($pos = strpos($lang,';')) $lang = substr($lang,0,$pos);
+			if ($pos = strpos($value,';')) $lang[$key] = substr($value,0,$pos);
 			// Cleanup locale array
-			$locale = strpos($lang,'-') ? str_replace('-','_',$lang) : $lang . '_' . $lang;
+			$locale[$key] = strpos($lang[$key],'-') ? str_replace('-','_',$lang[$key]) : $lang[$key] . '_' . $lang[$key];
 		}
 		
 		// Set lang cookie and locale
