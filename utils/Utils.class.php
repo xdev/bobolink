@@ -1297,8 +1297,11 @@ class Utils
 		}
 		
 		// Set lang cookie and locale
-		setcookie('lang', implode(',',$lang), time()+60*60*24*30);
+		setcookie('lang', implode(',',$lang), time()+60*60*24*30, '/');
 		setlocale(LC_TIME,$locale);
+		
+		// Return lang array
+		return $lang;
 	}
 	
 	/*
