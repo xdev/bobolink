@@ -396,11 +396,15 @@ class Utils
 	public static function assembleTime($prefix,$name_space)
 	{
 		
-		$t_h = $name_space . $prefix . '_hour';
-		$t_ap = $name_space . $prefix . '_meridiem';
+		$t_h   = $name_space . $prefix . '_hour';
+		$t_ap  = $name_space . $prefix . '_meridiem';
 		$t_min = $name_space . $prefix . '_minute';
-				
-		return self::time12to24($_POST[$t_h],$_POST[$t_ap]) . ":" . $_POST[$t_min] . ":00";
+		
+		$hour     = isset($_POST[$t_h])   ? $_POST[$t_h]   : '00';
+		$meridiem = isset($_POST[$t_ap])  ? $_POST[$t_ap]  : 'AM';
+		$min      = isset($_POST[$t_min]) ? $_POST[$t_min] : '00';
+		
+		return self::time12to24($hour,$meridiem) . ":" . $min . ":00";
 		
 	}
 	
