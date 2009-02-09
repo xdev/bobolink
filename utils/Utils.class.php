@@ -1327,39 +1327,44 @@ class Utils
 			if (!$timestamp = strtotime($datetime)) $timestamp = $datetime;
 			
 			// calculate the diffrence 
-			$timediff = time() - $timestamp;
+			if (($timediff = time() - $timestamp) > 0) {
 			
-			/* n minute(s) ago */
-			if ($timediff < 3600) {
-				if ($timediff < 120) {
-					$r = "1 minute ago";
-				} else {
-					$r =  intval($timediff / 60) . " minutes ago"; 
+				/* n minute(s) ago */
+				if ($timediff < 3600) {
+					if ($timediff < 120) {
+						$r = "1 minute ago";
+					} else {
+						$r =  intval($timediff / 60) . " minutes ago"; 
+					}
 				}
-			}
 			
-			/* n hour(s) ago */
-			elseif ($timediff < 7200) {
-				$r = "1 hour ago";
-			} else if ($timediff < 86400) {
-				$r = intval($timediff / 3600) . " hours ago";
-			}
+				/* n hour(s) ago */
+				elseif ($timediff < 7200) {
+					$r = "1 hour ago";
+				} else if ($timediff < 86400) {
+					$r = intval($timediff / 3600) . " hours ago";
+				}
 			
-			/* n day(s) ago */
-			else if ($timediff < 172800) {
-				$r = "1 day ago";
-			} else if ($timediff < 604800) {
-				$r = intval($timediff / 86400) . " days ago";
-			}
+				/* n day(s) ago */
+				else if ($timediff < 172800) {
+					//$r = "1 day ago";
+					$r = "yesterday";
+				}/* else if ($timediff < 604800) {
+					$r = intval($timediff / 86400) . " days ago";
+				}*/
 			
-			/* n week(s) ago */
-			/*elseif ($timediff < 1209600) {
-				$r = "1 week ago";
-			} else if ($timediff < 3024000) {
-				$r = intval($timediff / 604900) . " weeks ago";
-			}*/
-			
-			else { 
+				/* n week(s) ago */
+				/*elseif ($timediff < 1209600) {
+					$r = "1 week ago";
+				} else if ($timediff < 3024000) {
+					$r = intval($timediff / 604900) . " weeks ago";
+				}*/
+				
+				else { 
+					$r = @strftime($format, $timestamp);
+				}
+				
+			} else { 
 				$r = @strftime($format, $timestamp);
 			}
 			
