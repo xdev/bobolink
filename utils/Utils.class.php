@@ -1320,11 +1320,9 @@ class Utils
 	
 	*/
 	
-	public static function relativeDate($datetime = null, $format = '%e %B %Y')
+	public static function relativeDate($timestamp = null, $format = '%e %B %Y')
 	{
-		if ($datetime) {
-		
-			if (!$timestamp = strtotime($datetime)) $timestamp = $datetime;
+		if ($timestamp) {
 			
 			// calculate the diffrence 
 			if (($timediff = time() - $timestamp) > 0) {
@@ -1371,7 +1369,6 @@ class Utils
 			return $r;
 			
 		}
-		
 	}
 	
 	/*
