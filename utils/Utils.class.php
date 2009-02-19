@@ -795,7 +795,7 @@ class Utils
 		//need to build in the checkDirectory on the destination
 		
 		$options['crop']    = isset($options['crop'])    ? $options['crop']    : false;
-		$options['quality'] = isset($options['quality']) ? $options['quality'] : 100;
+		$options['quality'] = isset($options['quality']) ? $options['quality'] : 80;
 		
 		// Make sure we have values for both height & width
 		$new_w = $new_w ? $new_w : $new_h;
@@ -862,11 +862,7 @@ class Utils
 		// Resize image
 		else {
 			
-			if ($old_w == $old_h) {
-				$thumb_w=$new_w;
-				$thumb_h=$new_h;
-			}
-			elseif ($old_w > $old_h) {
+			if ($old_w >= $old_h) {
 				if ($old_ratio <= $new_ratio) {
 					$thumb_w=$new_w;
 					$thumb_h=ceil($new_w*($old_h/$old_w));
