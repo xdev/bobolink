@@ -1223,19 +1223,22 @@ class Utils
 	
 	public static function getTimezone($input = 0, $isdst = 0)
 	{
+		$tz = 'UTC';
 		if (strpos($input,'/')) {
 			$tz = $input;
 		}
-		elseif ($input === 0 && isset($_COOKIE['gmtOffset'])) {
-			$tz = timezone_name_from_abbr(null,$_COOKIE['gmtOffset'] * 3600, $isdst);
+		elseif (function_exists('timezone_name_from_abbr')) {
+			if ($input === 0 && isset($_COOKIE['gmtOffset'])) {
+				$tz = timezone_name_from_abbr(null,$_COOKIE['gmtOffset'] * 3600, $isdst);
+			}
+			elseif (is_numeric($input)) {
+				$tz = timezone_name_from_abbr(null,$input * 3600, $isdst);
+			}
+			else {
+				$tz = timezone_name_from_abbr($input);
+			}
 		}
-		elseif (is_numeric($input)) {
-			$tz = timezone_name_from_abbr(null,$input * 3600, $isdst);
-		}
-		else {
-			$tz = timezone_name_from_abbr($input);
-		}
-		return $tz ? $tz : 'UTC';
+		return $tz;
 	}
 	
 	/*
