@@ -27,6 +27,11 @@ class EmailProtector
 		}
 	}
 	
+	public function getKey()
+	{
+		return $this->_em_key;
+	}
+	
 	public function printKey()
 	{
 		print '
@@ -38,7 +43,7 @@ class EmailProtector
 	}
 	
 	private function encodeEmail($matches)
-	{
+	{				
 		if($this->mode == 'native'){
 			$iv_size = mcrypt_get_iv_size(MCRYPT_TRIPLEDES, MCRYPT_MODE_CBC);
 			$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
@@ -52,25 +57,28 @@ class EmailProtector
 		}
 	}
 	
-	public function formatEmail($txt='')
+	public function formatEmail($txt='',$format='\1 (at) \2')
 	{
+		if(function_exists('mcrypt_create')){
+			$text = preg_replace_callback(
+				'/href="mailto:([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+)"/',
+				array($this, 'encodeEmail'),
+				$txt
+			);
 		
-		$text = preg_replace_callback(
-			'/href="mailto:([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+)"/',
-			array($this, 'encodeEmail'),
-			$txt
-		);
-		
-		$patterns = array(
-					'/([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+)/'
-					);
+			$patterns = array(
+						'/([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+)/'
+						);
 
-		$replacements = array(
-					'\1'
-					);
+			$replacements = array(
+						$format
+						);
 
-		$text = preg_replace($patterns,$replacements,$text);
-		return $text;		
+			$text = preg_replace($patterns,$replacements,$text);
+			return $text;
+		}else{
+			return $txt;
+		}
 	}
 	
 }
