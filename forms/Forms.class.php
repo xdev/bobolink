@@ -791,7 +791,13 @@ class Forms
 				$dataA[] = array('(none)','');
 			}
 			foreach($tA as $row){
-				$dataA[] = array($row,$row);
+				//optionally split on ('|');
+				$vA = explode('|',$row);
+				if(count($vA)==2){
+					$dataA[] = array($vA[1],$vA[0]);
+				}else{
+					$dataA[] = array($row,$row);
+				}
 			}
 		}
 		
