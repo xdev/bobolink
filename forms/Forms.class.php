@@ -18,7 +18,7 @@ Typical use is as follows
 
 class Forms
 {
-
+	public static $markup_style = 'div';
 	/*
 	
 	Function: listManager
@@ -225,41 +225,47 @@ class Forms
 	
 	public static function buildElement($name,$content,$options)
 	{
-		
-		printf(
-			'
-			<div class="%s" id="form_item_%s" %s>
-				<label for="%s"%s>%s</label>
-				<div class="input">
-					%s
-					%s
+		if(!isset($options['label'])){
+			$options['label'] = ucfirst($name);
+		}
+		if(self::$markup_style == 'div'){
+			
+			printf(
+				'
+				<div class="%s" id="form_item_%s" %s>
+					<label for="%s"%s>%s</label>
+					<div class="input">
+						%s
+						%s
+					</div>
 				</div>
-			</div>
-			',
-			isset($options['class_main']) ? 'form_item '.$options['class_main'] : 'form_item',
-			$name,
-			isset($options['style_main']) ? 'style="' . $options['style_main'] . '"' : '',
-			$name,
-			isset($options['validate']) && $options['validate'] ? ' class="must_validate '.$options['validate'].'"' : '',
-			$options['label'],
-			$content,
-			isset($options['tip']) ? '<p class="tip">'.$options['tip'].'</p>' : ''
-		);
-		
-		/*
-		print "<div class=\"form_item\" id=\"form_item_".$name."\">";
-		
-		if(isset($options['tip'])){
-			(isset($options['validate'])) ? $class = ' must_validate' : $class = '';
-			print "<label class=\"tip" . $class . "\" title=\"" . $options['tip'] . "\" for=\"$name\"><span>$options[label]</span></label>";
-		}else{
-			(isset($options['validate'])) ? $class = 'class="must_validate ' . $options['validate'] . '"' : $class = '';
-			print"<label for=\"$name\" $class>$options[label]</label>";
+				',
+				isset($options['class_main']) ? 'form_item '.$options['class_main'] : 'form_item',
+				$name,
+				isset($options['style_main']) ? 'style="' . $options['style_main'] . '"' : '',
+				$name,
+				isset($options['validate']) && $options['validate'] ? ' class="must_validate '.$options['validate'].'"' : '',
+				$options['label'],
+				$content,
+				isset($options['tip']) ? '<p class="tip">'.$options['tip'].'</p>' : ''
+			);
 		}
 		
-		print "<div class=\"input\">$content</div>
-		</div>";
-		*/
+		if(self::$markup_style == 'definition_list'){
+			printf(
+				'<dl class="field">
+					<dt><label for="%s"%s>%s</label></dt>
+					<dd>%s%s</dd>
+				</dl>',				
+				$name,
+				isset($options['validate']) && $options['validate'] ? ' class="must_validate '.$options['validate'].'"' : '',
+				$options['label'],
+				$content,
+				isset($options['tip']) ? '<p class="tip">'.$options['tip'].'</p>' : ''
+			);
+		}
+		
+		
 	}
 	
 	/*
