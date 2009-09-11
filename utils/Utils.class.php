@@ -1032,6 +1032,22 @@ class Utils
 		}
 	}
 	
+	public static function uniqueFile($file)
+	{
+		//TODO: add behavior for uploading into local folder, use of files with no extension.
+		if(file_exists($file)){
+			$pos = strrpos($file,'.');
+			if($pos === false){
+				//we have no extension
+			}else{
+				$new = substr($file,0,$pos).'_.'.substr($file,$pos+1);
+				return self::uniqueFile($new);
+			}
+		}else{
+			return $file;
+		}			
+	}
+	
 	public static function checkDimensions($file,$options)
 	{
 		$image_dimensions = getimagesize($file['tmp_name']);
