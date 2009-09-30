@@ -232,7 +232,15 @@ class AdaptorMysql implements Db
 		$values = array();
 		foreach($row_data as $key=>$value){
 			$columns[] = '`'.$key.'`';
-			$values[] = '\''.mysql_real_escape_string(stripslashes($value)).'\'';
+			if(is_null($value)){
+				if(AdaptorMysql::isNullable($table,$key)){
+					$values[] = "NULL";
+				}else{
+					$values[] = '';
+				}
+			}else{
+				$values[] = '\''.mysql_real_escape_string(stripslashes($value)).'\'';
+			}			
 		}
 		$sql = "INSERT INTO `$table` (".implode(',',$columns).") VALUES (".implode(',',$values).")";
 		// can't do this
@@ -283,13 +291,46 @@ class AdaptorMysql implements Db
 		}
 		$columns = array();		
 		foreach($row_data as $key=>$value){
-			$columns[] = '`'.$key.'` = \''.mysql_real_escape_string(stripslashes($value)).'\'';
+			if(is_null($value)){
+				if(AdaptorMysql::isNullable($table,$key)){
+					$columns[] = '`'.$key.'` = NULL';
+				}else{
+					$columns[] = '`'.$key.'` = \'\'';
+				}
+			}else{
+				$columns[] = '`'.$key.'` = \''.mysql_real_escape_string(stripslashes($value)).'\'';
+			}
 		}
 		$sql = "UPDATE `$table` SET ".implode(',',$columns)." WHERE `$k` = '$v'";
 		mysql_query($sql,self::$connection) or die(mysql_error() . "<p class=\"error\">$sql</p>");
 		return $sql;
 	}
-
+	
+	public static function getTableMeta($table,$field=null)
+	{
+		if($q = self::query("DESC `$table`")){
+			if($field){
+				foreach($q as $row){
+					if($row['Field'] == $field){
+						return $row;
+					}
+				}
+			}else{
+				return $q;
+			}
+		}
+		return false;
+	}
+	
+	public static function isNullable($table,$field)
+	{
+		$q = self::getTableMeta($table,$field);
+		if($q['Null'] == 'YES'){
+			return true;
+		}		
+		return false;
+	}
+	
 	/*
 
 	Function: getInsertId

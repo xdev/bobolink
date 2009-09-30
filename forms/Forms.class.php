@@ -599,7 +599,7 @@ class Forms
 			isset($options['onchange']) ? "onchange=\"$options[onchange]\"" : ''
 		);
 		if(!isset($options['allow_null']) || $options['allow_null'] === true){
-			$r .= '<option value="">(none)</option>';
+			$r .= '<option value="&#00;">(none)</option>';
 		}
 		$dA = explode("|",$col_display);
 		
@@ -662,12 +662,10 @@ class Forms
 			$class,
 			isset($options['onchange']) ? "onchange=\"$options[onchange]\"" : ''
 		);
-		$r .= '<option value="">(none)</option>';
-		
-		
-		
+		if(!isset($options['allow_null']) || $options['allow_null'] === true){
+			$r .= '<option value="&#00;">(none)</option>';
+		}
 		$r .= self::getChildren($name,$value,$options,0,'',$options['parent_field_name']);
-		
 		$r .= "</select>";
 		
 		self::buildElement($name,$r,$options);
@@ -938,7 +936,14 @@ class Forms
 			
 		$r  = self::dateComponent($date,$name,$options);
 		$r .= self::timeComponent($time,$name,$options);
-		
+		if(isset($options['allow_null'])){
+			//this would bind to a js to deactivate fields
+			$checked = '';
+			if($value == '0000-00-00 00:00:00'){
+				$checked = 'checked="checked"';
+			}
+			$r .= '<input type="checkbox" name="'.$name.'_isnull" '.$checked.' />Null';
+		}
 		//this is only for validaton from the label for attribute
 		$r .= '<span id="' . $name . '" />';
 			
@@ -966,6 +971,13 @@ class Forms
 		$date = array($tD[1],$tD[2],$tD[0]);
 		
 		$r  = self::dateComponent($date,$name,$options);
+		if(isset($options['allow_null'])){
+			$checked = '';
+			if($value == '0000-00-00'){
+				$checked = 'checked="checked"';
+			}
+			$r .= '<input type="checkbox" name="'.$name.'_isnull" '.$checked.' />Null';
+		}
 		self::buildElement($name,$r,$options);
 	}
 	
@@ -991,6 +1003,12 @@ class Forms
 		
 		$r = '<select name="'. $name. '_month" class="noparse" >';
 		$monthA = self::getMonths();
+		
+		if(isset($options['allow_null'])){
+			($date[0] == '00') ? $selected="selected=\"selected\"" : $selected = "";
+			$r .= "<option value=\"00\" $selected></option>";
+		}
+		
 		for($i=1;$i<13;$i++){
 			($i == $date[0]) ? $selected="selected=\"selected\"" : $selected = "";
 			$v = $monthA[($i-1)];
@@ -1001,6 +1019,11 @@ class Forms
 		$r .= '/';
 		$r .= '<select name="' . $name . '_day" class="noparse" >';
 		
+		if(isset($options['allow_null'])){
+			($date[1] == '00') ? $selected="selected=\"selected\"" : $selected = "";
+			$r .= "<option value=\"00\" $selected></option>";
+		}
+		
 		for($i=1;$i<32;$i++){
 			($i == $date[1]) ? $selected="selected=\"selected\"" : $selected = "";
 			$r .= "<option value=\"$i\" $selected >$i</option>";
@@ -1008,6 +1031,11 @@ class Forms
 		
 		$r .= '</select>';
 		$r .= '/';
+		
+		// Text Input Mode
+		//$r .= '<input style="width:40px;" name="'. $name . '_year" class="noparse" type="text" maxlength="4" size="3" value="'.$date[2].'"/>';
+		
+		
 		$r .= '<select name="' .  $name . '_year" class="noparse" >';
 		
 		//set the the default range for years
@@ -1022,12 +1050,21 @@ class Forms
 			$max = $options['max_year'];
 		}
 		
+		if(isset($options['allow_null'])){
+			($date[2] == '0000') ? $selected="selected=\"selected\"" : $selected = "";
+			$r .= "<option value=\"0000\" $selected></option>";
+		}
+		
+		if($min == '0000'){
+			$min = date('Y')-20;
+		}
+		
 		for($i=$min;$i< $max;$i++){
 			($i == $date[2]) ? $selected="selected=\"selected\"" : $selected = "";
 			$r .= "<option value=\"$i\" $selected >$i</option>";
 		}
 		
-		$r .= '</select>';
+		$r .= '</select>';	
 		
 		return $r;
 	}
@@ -1045,7 +1082,7 @@ class Forms
 	*
 	*/
 	
-	public static function timeComponent($time,$name,$name_space)
+	public static function timeComponent($time,$name,$options)
 	{
 		
 		$r = '<select name="' . $name . '_hour" class="noparse" >';
@@ -1099,7 +1136,16 @@ class Forms
 		$t = explode(":",Utils::time24to12($tD[0]));
 		$time = array($t[0],$tD[1],$t[1]);
 	
-		$r = self::timeComponent($time,$name,$options['name_space']);
+		$r = self::timeComponent($time,$name,$options);
+		
+		if(isset($options['allow_null'])){
+			//this would bind to a js to deactivate fields
+			$checked = '';
+			if($value == '00:00:00'){
+				$checked = 'checked="checked"';
+			}
+			$r .= '<input type="checkbox" name="'.$name.'_isnull" '.$checked.' />Null';
+		}
 		
 		self::buildElement($name,$r,$options);
 		
