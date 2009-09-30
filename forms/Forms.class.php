@@ -664,56 +664,58 @@ class Forms
 		);
 		$r .= '<option value="">(none)</option>';
 		
-		function getChildren($name,$value,$options,$parent=0,$depth='',$parent_field_name='parent_id')
-		{
-			$dA = explode("|",$options['col_display']);
-			$r = '';
-			if (strpos($options['select_sql'],'ORDER BY')) {
-				$sql = str_replace(
-					'ORDER BY',
-					(strpos($options['select_sql'],'WHERE') ? 'AND ' : 'WHERE ').$parent_field_name.' = '.$parent.' ORDER BY',
-					$options['select_sql']
-				);
-			} else {
-				$sql = $options['select_sql'].(strpos($options['select_sql'],'WHERE') ? ' AND ' : ' WHERE ').$parent_field_name.' = '.$parent;
-			}
-			if ($q = $options['db']->query($sql)) {
-				
-				foreach ($q as $row) {
-					$tv = $row[$options['col_value']];
-					$selected = (trim($value) == trim($tv)) ? ' selected="selected"' : '';
-					$disabled = ($tv == $options['id']) ? ' disabled="disabled"' : ''; // Prevent selecting self as parent
-					if (count($dA) > 1) {
-						$td = "";
-						for ($j=0;$j<count($dA);$j++) {
-							$td .= $row[$dA[$j]];
-							if ($j<count($dA) - 1) {
-								$td .= $col_display_separator;
-							}
-						}
-					} else {
-						$td = $row[$options['col_display']];
-					}
-				
-					$r .= sprintf(
-						'<option value="%s"%s%s>%s</option>',
-						$tv,
-						$selected,
-						$disabled,
-						$depth.$td
-					);
-					$r .= getChildren($name,$value,$options,$row[$options['col_value']],$depth.'— ',$parent_field_name);
-			
-				}
-			}
-			return $r;
-		}
 		
-		$r .= getChildren($name,$value,$options,0,'',$options['parent_field_name']);
+		
+		$r .= self::getChildren($name,$value,$options,0,'',$options['parent_field_name']);
 		
 		$r .= "</select>";
 		
 		self::buildElement($name,$r,$options);
+	}
+	
+	private static function getChildren($name,$value,$options,$parent=0,$depth='',$parent_field_name='parent_id')
+	{
+		$dA = explode("|",$options['col_display']);
+		$r = '';
+		if (strpos($options['select_sql'],'ORDER BY')) {
+			$sql = str_replace(
+				'ORDER BY',
+				(strpos($options['select_sql'],'WHERE') ? 'AND ' : 'WHERE ').$parent_field_name.' = '.$parent.' ORDER BY',
+				$options['select_sql']
+			);
+		} else {
+			$sql = $options['select_sql'].(strpos($options['select_sql'],'WHERE') ? ' AND ' : ' WHERE ').$parent_field_name.' = '.$parent;
+		}
+		if ($q = $options['db']->query($sql)) {
+			
+			foreach ($q as $row) {
+				$tv = $row[$options['col_value']];
+				$selected = (trim($value) == trim($tv)) ? ' selected="selected"' : '';
+				$disabled = ($tv == $options['id']) ? ' disabled="disabled"' : ''; // Prevent selecting self as parent
+				if (count($dA) > 1) {
+					$td = "";
+					for ($j=0;$j<count($dA);$j++) {
+						$td .= $row[$dA[$j]];
+						if ($j<count($dA) - 1) {
+							$td .= $col_display_separator;
+						}
+					}
+				} else {
+					$td = $row[$options['col_display']];
+				}
+			
+				$r .= sprintf(
+					'<option value="%s"%s%s>%s</option>',
+					$tv,
+					$selected,
+					$disabled,
+					$depth.$td
+				);
+				$r .= self::getChildren($name,$value,$options,$row[$options['col_value']],$depth.'— ',$parent_field_name);
+		
+			}
+		}
+		return $r;
 	}
 	
 	/*
