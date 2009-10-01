@@ -662,28 +662,45 @@ class Forms
 			$class,
 			isset($options['onchange']) ? "onchange=\"$options[onchange]\"" : ''
 		);
-		if(!isset($options['allow_null']) || $options['allow_null'] === true){
+		if(isset($options['allow_null'])){
 			$r .= '<option value="&#00;">(none)</option>';
 		}
-		$r .= self::getChildren($name,$value,$options,0,'',$options['parent_field_name']);
+		// Todo: Move from null to 0
+		if($options['db']->isNullable($options['table'],$options['parent_field_name'])){
+			$start_value = null;
+		}else{
+			$start_value = 0;
+		}
+				
+		$r .= self::getChildren($name,$value,$options,$start_value,'',$options['parent_field_name']);
 		$r .= "</select>";
 		
 		self::buildElement($name,$r,$options);
 	}
 	
-	private static function getChildren($name,$value,$options,$parent=0,$depth='',$parent_field_name='parent_id')
+	private static function getChildren($name,$value,$options,$parent,$depth='',$parent_field_name='parent_id')
 	{
+		//die(print_r(debug_backtrace()));
+		//is nullable
+		
+		if($options['db']->isNullable($options['table'],$parent_field_name) && is_null($parent)){			
+			$_v = ' IS NULL ';
+		}else{
+			$_v = " = '$parent' ";
+		}				
+		
 		$dA = explode("|",$options['col_display']);
 		$r = '';
 		if (strpos($options['select_sql'],'ORDER BY')) {
 			$sql = str_replace(
 				'ORDER BY',
-				(strpos($options['select_sql'],'WHERE') ? 'AND ' : 'WHERE ').$parent_field_name.' = '.$parent.' ORDER BY',
+				(strpos($options['select_sql'],'WHERE') ? 'AND ' : 'WHERE ').$parent_field_name . $_v . ' ORDER BY',
 				$options['select_sql']
 			);
 		} else {
-			$sql = $options['select_sql'].(strpos($options['select_sql'],'WHERE') ? ' AND ' : ' WHERE ').$parent_field_name.' = '.$parent;
+			$sql = $options['select_sql'].(strpos($options['select_sql'],'WHERE') ? ' AND ' : ' WHERE ').$parent_field_name . $_v;
 		}
+		
 		if ($q = $options['db']->query($sql)) {
 			
 			foreach ($q as $row) {
