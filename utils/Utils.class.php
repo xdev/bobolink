@@ -943,6 +943,13 @@ class Utils
 		return $r;
 	}
 	
+	public static function isNull($value)
+	{
+		if($value == "&#00;" || is_null($value)){
+			return true;
+		}
+		return false;
+	}
 	
 	/*
 	
@@ -961,7 +968,7 @@ class Utils
 		string    
 		
 	*/
-
+	
 	public static function hexToString($h)
 	{
 		$r = "";
