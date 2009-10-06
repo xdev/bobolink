@@ -173,7 +173,6 @@ class AdaptorMysql implements Db
 	*/
 
 	public static function query($sql,$mode=MYSQL_ASSOC){
-
 		$r = mysql_query($sql,self::$connection) or die(mysql_error() . $sql);
 		if(mysql_num_rows($r) == 0){
 			return array();

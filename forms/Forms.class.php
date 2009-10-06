@@ -666,12 +666,12 @@ class Forms
 			$r .= '<option value="&#00;">(none)</option>';
 		}
 		// Todo: Move from null to 0
-		if($options['db']->isNullable($options['table'],$options['parent_field_name'])){
+		if($options['db']->isNullable($options['select_table'],$options['parent_field_name'])){
 			$start_value = null;
 		}else{
 			$start_value = 0;
 		}
-				
+		
 		$r .= self::getChildren($name,$value,$options,$start_value,'',$options['parent_field_name']);
 		$r .= "</select>";
 		
@@ -683,7 +683,7 @@ class Forms
 		//die(print_r(debug_backtrace()));
 		//is nullable
 		
-		if($options['db']->isNullable($options['table'],$parent_field_name) && is_null($parent)){			
+		if($options['db']->isNullable($options['select_table'],$parent_field_name) && is_null($parent)){			
 			$_v = ' IS NULL ';
 		}else{
 			$_v = " = '$parent' ";
@@ -705,8 +705,10 @@ class Forms
 			
 			foreach ($q as $row) {
 				$tv = $row[$options['col_value']];
+				
 				$selected = (trim($value) == trim($tv)) ? ' selected="selected"' : '';
-				$disabled = ($tv == $options['id']) ? ' disabled="disabled"' : ''; // Prevent selecting self as parent
+				//Todo: Fix disabled
+				$disabled = '';//($tv == $options['id']) ? ' disabled="disabled"' : ''; // Prevent selecting self as parent
 				if (count($dA) > 1) {
 					$td = "";
 					for ($j=0;$j<count($dA);$j++) {
